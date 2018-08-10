@@ -1,6 +1,6 @@
 {
   "name": "discord_bots",
-  "version": "1.0.0",
+  "version": "0.1.3",
   "description": "A bot made for the /r/Discord_Bots sDiscord server.",
   "main": "index.js",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Mundayne/Discord_Bots.git"
+    "url": "git+https://github.com/Mundayne/Discord_Bot.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Mundayne/Discord_Bots/issues"
+    "url": "https://github.com/Mundayne/Discord_Bot/issues"
   },
-  "homepage": "https://github.com/Mundayne/Discord_Bots#readme",
+  "homepage": "https://github.com/Mundayne/Discord_Bot#readme",
   "dependencies": {
     "discord.js": "^11.3.2"
   },
