@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/Mundayne/Discord_Bot#readme",
   "dependencies": {
-    "discord.js": "^11.3.2"
+    "discord.js": "^11.4.0"
   },
   "devDependencies": {
     "standard": "*"
