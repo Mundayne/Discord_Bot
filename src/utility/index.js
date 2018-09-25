@@ -1,4 +1,4 @@
 module.exports = {
-  Arguments: require('./arguments/Arguments'),
-  Types: require('./arguments/Types')
+	Arguments: require('./arguments/Arguments'),
+	Types: require('./arguments/Types')
 }
