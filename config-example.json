@@ -1,6 +1,6 @@
 {
-  "token": "bot-token",
-  "prefix": "?",
-  "procName": "Discord_Bots",
-  "authors": ["Mundane"]
+	"token": "bot-token",
+	"prefix": "?",
+	"procName": "Discord_Bots",
+	"authors": ["Mundane"]
 }
