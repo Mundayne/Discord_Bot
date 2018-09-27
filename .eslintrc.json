@@ -2,6 +2,7 @@
 	"extends": "standard",
 	"rules": {
 		"indent": ["error", "tab"],
-		"no-tabs": "off"
+		"no-tabs": "off",
+		"no-warning-comments": "warn"
 	}
 }
