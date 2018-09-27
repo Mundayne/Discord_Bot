@@ -35,9 +35,9 @@ class Arguments {
 				result = Arguments.parseArgument(passed[i], format)
 				if (!result.success) {
 					/*
-            If the argument was optional, perhaps this value is intended to be
-            the next argument's
-          */
+						If the argument was optional, perhaps this value is intended to be
+						the next argument's
+					*/
 					if (!format.required && argFormats[i + 1] && argFormats[i + 1].type.includes(typeof passed[i])) {
 						repeat = true
 						i++
