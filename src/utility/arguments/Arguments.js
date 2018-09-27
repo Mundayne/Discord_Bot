@@ -6,7 +6,7 @@ const { ArgumentError } = require('../../errors')
 class Arguments {
 	static parse (format, raw) {
 		// Only parse valid format strings
-		if (!format || (format[0] !== '<' && format[0] !== '[]')) return
+		if (!format || (format[0] !== '<' && format[0] !== '[')) return
 
 		// Will contain argument map for final return
 		let args = { }
