@@ -46,7 +46,7 @@ class Handler {
 		process.title = Config.procName
 	}
 
-	message (_self, message) {
+	async message (_self, message) {
 		// Non-handling cases
 		if (message.author.bot) return
 		if (message.channel.type !== 'text') return
@@ -59,13 +59,16 @@ class Handler {
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
-			let pre = command.pre(this, message)
-			let result = command.run(this, message, Arguments.parse(command.help.args, content.join(' ')), pre)
-			command.post(this, message, result)
+			let pre = await command.pre(this, message)
+			let result = await command.run(this, message, Arguments.parse(command.help.args, content.join(' ')), pre)
+			await command.post(this, message, result)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
-			} else throw e
+			} else {
+				console.error(`Error during command "${name}":`)
+				console.error(e)
+			}
 		}
 	}
 

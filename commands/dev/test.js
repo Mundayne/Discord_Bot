@@ -1,15 +1,15 @@
-exports.pre = (client, message) => {
+exports.pre = async (client, message) => {
 	console.log('Test command run by ' + message.author.username)
 }
 
-exports.run = (client, message, args, pre) => {
+exports.run = async (client, message, args, pre) => {
 	let initialText = args.echo || 'Test message.'
 	let text = ''
 	for (let i = 0; i < args.repeat; i++) text += initialText
-	message.author.send(text).catch(console.error)
+	return message.author.send(text)
 }
 
-exports.post = (client, message, result) => {
+exports.post = async (client, message, result) => {
 	console.log('Test command complete!')
 }
 
