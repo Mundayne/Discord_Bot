@@ -1,4 +1,4 @@
-const ArgumentRegex = /[[<](\w+):(\w+)=?(\w+)?[\]>]/ // eslint-disable-line
+const ArgumentRegex = /^[[<](\w+):(\w+)(?:=(.+))?[\]>]$/
 
 const Types = require('./Types')
 const { ArgumentError } = require('../../errors')
@@ -14,8 +14,13 @@ class Arguments {
 		let argFormats = [ ]
 
 		// Grab all the relevant information from the argument format string
-		format.split(' ').forEach(arg => {
-			let [, name, type, _default] = ArgumentRegex.exec(arg)
+		format.split(/(?<=>|]) (?=<|\[)/).forEach(arg => {
+			let name, type, _default
+			try {
+				[, name, type, _default] = ArgumentRegex.exec(arg)
+			} catch (err) {
+				throw new Error(`Invalid argument format string: "${arg}"`)
+			}
 			// Temporarily hold some information for each argument's parse
 			argFormats.push({ name: name,
 				type: type[0] === '?'
