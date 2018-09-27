@@ -1,4 +1,4 @@
-const ArgumentRegex = /[[<](\w+):(\w+)=?(\w+)?[\]>]/ // eslint-disable-line
+const ArgumentRegex = /^[[<](\w+):(\w+)(?:=(.+))?[\]>]$/
 
 const Types = require('./Types')
 const { ArgumentError } = require('../../errors')
@@ -6,7 +6,7 @@ const { ArgumentError } = require('../../errors')
 class Arguments {
 	static parse (format, raw) {
 		// Only parse valid format strings
-		if (!format || (format[0] !== '<' && format[0] !== '[]')) return
+		if (!format || (format[0] !== '<' && format[0] !== '[')) return
 
 		// Will contain argument map for final return
 		let args = { }
@@ -14,8 +14,13 @@ class Arguments {
 		let argFormats = [ ]
 
 		// Grab all the relevant information from the argument format string
-		format.split(' ').forEach(arg => {
-			let [, name, type, _default] = ArgumentRegex.exec(arg)
+		format.split(/(?<=>|]) (?=<|\[)/).forEach(arg => {
+			let name, type, _default
+			try {
+				[, name, type, _default] = ArgumentRegex.exec(arg)
+			} catch (err) {
+				throw new Error(`Invalid argument format string: "${arg}"`)
+			}
 			// Temporarily hold some information for each argument's parse
 			argFormats.push({ name: name,
 				type: type[0] === '?'
@@ -35,9 +40,9 @@ class Arguments {
 				result = Arguments.parseArgument(passed[i], format)
 				if (!result.success) {
 					/*
-            If the argument was optional, perhaps this value is intended to be
-            the next argument's
-          */
+						If the argument was optional, perhaps this value is intended to be
+						the next argument's
+					*/
 					if (!format.required && argFormats[i + 1] && argFormats[i + 1].type.includes(typeof passed[i])) {
 						repeat = true
 						i++
