@@ -1,8 +1,98 @@
 const yargsParser = require('yargs-parser')
 
-const { UnixArgumentError } = require('../../errors')
+const { UnixArgumentError, UnixHelpError } = require('../../errors')
 
 class UnixArguments {
+	/**
+	 * Generates a command's usage information from its parser options
+	 * @param {Object} opts Parser options of the command
+	 * @returns {String} Usage information for the command
+	 */
+	static generateUsage (opts) {
+		let argStringsMap = new Map()
+
+		// document argument names and types
+		for (let type of ['boolean', 'channel', 'float', 'integer', 'number', 'string', 'user']) {
+			for (let arg of (opts[type] || [])) {
+				argStringsMap.set(arg, `--${arg}:${type}`)
+			}
+		}
+		for (let arg of (opts.array || [])) {
+			argStringsMap.set(arg, `--${arg}:string[]`)
+		}
+
+		// for arguments requiring a certain number of values, document that
+		for (let arg in (opts.narg || {})) {
+			let argString = argStringsMap.get(arg)
+			if (!argString) continue
+			if (argString.endsWith('[]')) {
+				argStringsMap.set(arg, `${argString.slice(0, -1)}${opts.narg[arg]}]`)
+			} else {
+				argStringsMap.set(arg, `${argString}[${opts.narg[arg]}]`)
+			}
+		}
+
+		// document default values
+		for (let arg in (opts.default || {})) {
+			let argString = argStringsMap.get(arg)
+			if (!argString) continue
+			if (opts.default[arg].description) {
+				argStringsMap.set(arg, `${argString}={${opts.default[arg].description}}`)
+			} else if (argString.includes(':string')) {
+				argStringsMap.set(arg, `${argString}="${opts.default[arg]}"`)
+			} else {
+				argStringsMap.set(arg, `${argString}=${opts.default[arg]}`)
+			}
+		}
+
+		// handle exclusive groups
+		let groupArgStrings = []
+		let groupArgs = []
+		for (let group of (opts.exclusive || [])) {
+			groupArgs.push(...group)
+			let required = group.some(e => (opts.required || []).includes(e))
+			let groupArgString = group.map(e => argStringsMap.get(e)).sort().join(' | ')
+			if (required) {
+				groupArgStrings.push(`<${groupArgString}>`)
+			} else {
+				groupArgStrings.push(`[${groupArgString}]`)
+			}
+		}
+		for (let arg of groupArgs) {
+			argStringsMap.delete(arg)
+		}
+
+		// handle the remaining single arguments
+		let singleArgStrings = []
+		for (let [key, value] of argStringsMap.entries()) {
+			if ((opts.required || []).includes(key)) {
+				singleArgStrings.push(`<${value}>`)
+			} else {
+				singleArgStrings.push(`[${value}]`)
+			}
+		}
+
+		/*
+			put everthing together in this order:
+			required groups, required single args, optional groups, optional single args
+			arguments within each category are sorted alphabetically
+		*/
+		let usageInfo = []
+		for (let arg of groupArgStrings.filter(e => e.startsWith('<')).sort()) {
+			usageInfo.push(arg)
+		}
+		for (let arg of singleArgStrings.filter(e => e.startsWith('<')).sort()) {
+			usageInfo.push(arg)
+		}
+		for (let arg of groupArgStrings.filter(e => e.startsWith('[')).sort()) {
+			usageInfo.push(arg)
+		}
+		for (let arg of singleArgStrings.filter(e => e.startsWith('[')).sort()) {
+			usageInfo.push(arg)
+		}
+		return usageInfo.join(' ')
+	}
+
 	/**
 	 * Parses UNIX-style arguments for a command
 	 * @param {Object} opts Parser options
@@ -45,6 +135,16 @@ class UnixArguments {
 			}
 		}
 
+		// ensure all arrays are strings (so we're able to give a single type in the usage information)
+		if (optsCopy.array) {
+			optsCopy.string = optsCopy.string || []
+			for (let item of (optsCopy.array || [])) {
+				if (!optsCopy.string.includes(item)) {
+					optsCopy.string.push(item)
+				}
+			}
+		}
+
 		// remove non-literal defaults
 		if (optsCopy.default) {
 			for (let key in optsCopy.default) {
@@ -55,7 +155,8 @@ class UnixArguments {
 		// use yargs-parser for main parsing
 		let parsed = yargsParser(raw, optsCopy)
 
-		// TODO if "help" is set, abort and print usage
+		// if "help" is set, abort and print usage
+		if (parsed.help) throw new UnixHelpError()
 
 		// validate parsing results (types and required/exclusive arguments)
 		let required = opts.required || []

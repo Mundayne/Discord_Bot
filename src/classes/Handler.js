@@ -1,6 +1,6 @@
 const FS = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
-const { ArgumentError, UnixArgumentError } = require('../errors')
+const { ArgumentError, UnixArgumentError, UnixHelpError } = require('../errors')
 const Config = require('../../config')
 
 class Handler {
@@ -68,6 +68,8 @@ class Handler {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof UnixArgumentError) {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
+			} else if (e instanceof UnixHelpError) {
+				message.channel.send(`${'```'}\nUsage:\n${Config.prefix}${name} ${command.help.args}\n${'```'}`).catch(console.error)
 			} else {
 				console.error(`Error during command "${name}":`)
 				console.error(e)
