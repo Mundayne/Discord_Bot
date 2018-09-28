@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/Mundayne/Discord_Bot#readme",
   "dependencies": {
-    "discord.js": "^11.4.0"
+    "discord.js": "^11.4.0",
+    "yargs-parser": "^10.1.0"
   },
   "devDependencies": {
     "eslint": "^5.6.0",

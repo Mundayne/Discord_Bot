@@ -1,6 +1,6 @@
 const FS = require('fs')
-const { Arguments } = require('../utility')
-const { ArgumentError } = require('../errors')
+const { Arguments, UnixArguments } = require('../utility')
+const { ArgumentError, UnixArgumentError } = require('../errors')
 const Config = require('../../config')
 
 class Handler {
@@ -59,11 +59,14 @@ class Handler {
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
+			const args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let pre = await command.pre(this, message)
-			let result = await command.run(this, message, Arguments.parse(command.help.args, content.join(' ')), pre)
+			let result = await command.run(this, message, args, pre)
 			await command.post(this, message, result)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
+				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
+			} else if (e instanceof UnixArgumentError) {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else {
 				console.error(`Error during command "${name}":`)

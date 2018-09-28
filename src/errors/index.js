@@ -1,3 +1,4 @@
 module.exports = {
-	ArgumentError: require('./ArgumentError')
+	ArgumentError: require('./ArgumentError'),
+	UnixArgumentError: require('./UnixArgumentError')
 }
