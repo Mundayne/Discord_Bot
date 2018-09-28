@@ -225,7 +225,7 @@ class UnixArguments {
 		for (let arg of (opts.integer || [])) {
 			let argValues = Array.isArray(parsed[arg]) ? parsed[arg] : [parsed[arg]]
 			argValues.forEach(e => {
-				if (Number.isNaN(e) || e !== Math.trunc(e)) {
+				if (Number.isNaN(e) || (e !== undefined && e !== Math.trunc(e))) {
 					throw new UnixArgumentError({ error: 'type', args: [arg], expected: 'integer' })
 				}
 			})
