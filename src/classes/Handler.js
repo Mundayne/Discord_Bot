@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const FS = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
 const { ArgumentError, UnixArgumentError, UnixHelpError } = require('../errors')
@@ -41,9 +42,16 @@ class Handler {
 		console.info(`Done! ${count.commands} commands loaded across ${count.groups} groups.`)
 	}
 
-	start () {
-		this.client.login(Config.token)
-		process.title = Config.procName
+	async start () {
+		try {
+			await mongoose.connect(Config.database, { useNewUrlParser: true })
+			await this.client.login(Config.token)
+			process.title = Config.procName
+		} catch (err) {
+			console.error('Fatal error while starting bot:')
+			console.error(err)
+			process.exit(1)
+		}
 	}
 
 	async message (_self, message) {

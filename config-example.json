@@ -1,5 +1,6 @@
 {
 	"token": "bot-token",
+	"database": "mongodb://localhost:27017/db-community-bot",
 	"prefix": "?",
 	"procName": "Discord_Bots",
 	"authors": ["Mundane"]
