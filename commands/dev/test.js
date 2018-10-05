@@ -1,6 +1,4 @@
-exports.pre = async (client, message) => {
-	console.log('Test command run by ' + message.author.username)
-}
+exports.pre = async (client, message) => {}
 
 exports.run = async (client, message, args, pre) => {
 	let initialText = args.echo || 'Test message.'
@@ -9,9 +7,7 @@ exports.run = async (client, message, args, pre) => {
 	return message.author.send(text)
 }
 
-exports.post = async (client, message, result) => {
-	console.log('Test command complete!')
-}
+exports.post = async (client, message, result) => {}
 
 exports.help = {
 	name: ['test'],

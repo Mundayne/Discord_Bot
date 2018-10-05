@@ -67,10 +67,12 @@ class Handler {
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
+			console.log(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
 			const args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let pre = await command.pre(this, message)
 			let result = await command.run(this, message, args, pre)
 			await command.post(this, message, result)
+			console.log(`Command "${name}" complete`)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)

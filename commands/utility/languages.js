@@ -2,9 +2,7 @@ const Language = require('../../src/models/Language.js')
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
-exports.pre = async (client, message) => {
-	console.log('Command "languages" run by ' + message.author.username)
-}
+exports.pre = async (client, message) => {}
 
 exports.run = async (client, message, args, pre) => {
 	if (!(args.add || args.remove || args.list)) {
@@ -105,9 +103,7 @@ exports.run = async (client, message, args, pre) => {
 	return message.channel.send(text)
 }
 
-exports.post = async (client, message, result) => {
-	console.log('Command "languages" complete!')
-}
+exports.post = async (client, message, result) => {}
 
 exports.yargsOpts = {
 	alias: {
