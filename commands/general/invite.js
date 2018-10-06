@@ -1,5 +1,6 @@
+const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
+
 exports.pre = async (client, message) => {
-  console.log('Invite command run by ' + message.author.username);
 }
 
 exports.run = async (client, message, args, pre) => {
@@ -9,7 +10,6 @@ exports.run = async (client, message, args, pre) => {
 exports.yargsOpts = {}
 
 exports.post = async (client, message, result) => {
-	console.log('Invite command complete!')
 }
 
 exports.help = {
