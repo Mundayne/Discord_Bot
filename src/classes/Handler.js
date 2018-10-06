@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const FS = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
-const { ArgumentError, UnixArgumentError, UnixHelpError } = require('../errors')
+const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
 const Config = require('../../config')
 
 class Handler {
@@ -68,14 +68,19 @@ class Handler {
 		let command = cmds[name]
 		try {
 			console.log(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
-			const args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let pre = await command.pre(this, message)
+			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let result = await command.run(this, message, args, pre)
 			await command.post(this, message, result)
 			console.log(`Command "${name}" complete`)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
+			} else if (e instanceof InsufficientPermissionsError) {
+				console.log(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
+				message.reply('you are not authorized to use this command.').then(m => m.delete(8000)).catch(console.error)
+			} else if (e instanceof PreCheckFailedError) {
+				console.log(`Pre-Check failed for command "${name}", reason: ${e.message}`)
 			} else if (e instanceof UnixArgumentError) {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof UnixHelpError) {

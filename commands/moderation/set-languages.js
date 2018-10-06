@@ -1,14 +1,15 @@
 const Language = require('../../src/models/Language.js')
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
-const UnixHelpError = require('../../src/errors/UnixHelpError.js')
+const { InsufficientPermissionsError, UnixHelpError } = require('../../src/errors')
 
-exports.pre = async (client, message) => {}
-
-exports.run = async (client, message, args, pre) => {
+exports.pre = async (client, message) => {
 	let authorMember = await message.guild.fetchMember(message.author)
 	if (!authorMember.hasPermission('ADMINISTRATOR')) {
-		return message.reply('you are not authorized to use this command.')
+		throw new InsufficientPermissionsError()
 	}
+}
+
+exports.run = async (client, message, args, pre) => {
 	if (!(args.create || args.delete || args.list)) {
 		throw new UnixHelpError()
 	}
