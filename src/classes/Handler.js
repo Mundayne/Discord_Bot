@@ -48,6 +48,10 @@ class Handler {
 						if (typeof command.post !== 'function') {
 							command.post = async (client, message, result) => {}
 						}
+						// generate usage information if the command uses the unix parser and does not have any
+						if (command.yargsOpts && command.help.args === undefined) {
+							command.help.args = UnixArguments.generateUsage(command.yargsOpts)
+						}
 						this.commands[group][name] = command
 					}
 				})

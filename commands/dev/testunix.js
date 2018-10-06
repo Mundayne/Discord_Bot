@@ -1,5 +1,3 @@
-const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
-
 exports.run = async (client, message, args, pre) => {
 	let initialText = args.echo
 	let text = ''
@@ -43,6 +41,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['testunix'],
 	group: 'dev',
-	description: 'A test command with UNIX-style arguments.',
-	args: UnixArguments.generateUsage(exports.yargsOpts)
+	description: 'A test command with UNIX-style arguments.'
 }

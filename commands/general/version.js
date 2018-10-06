@@ -1,5 +1,3 @@
-const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
-
 const VERSION = require('../../package.json').version
 
 exports.run = async (client, message, args, pre) => {
@@ -11,6 +9,5 @@ exports.yargsOpts = {}
 exports.help = {
 	name: ['version'],
 	group: 'general',
-	description: 'Shows the bot\'s version.',
-	args: UnixArguments.generateUsage(exports.yargsOpts)
+	description: 'Shows the bot\'s version.'
 }
