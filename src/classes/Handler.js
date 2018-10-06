@@ -95,6 +95,7 @@ class Handler {
 			console.log(`Command "${name}" complete`)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
+				console.log(`Invalid arguments given for command "${name}"`)
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof InsufficientPermissionsError) {
 				console.log(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
@@ -102,8 +103,10 @@ class Handler {
 			} else if (e instanceof PreCheckFailedError) {
 				console.log(`Pre-Check failed for command "${name}", reason: ${e.message}`)
 			} else if (e instanceof UnixArgumentError) {
+				console.log(`Invalid arguments given for command "${name}"`)
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof UnixHelpError) {
+				console.log(`Sending usage information for command "${name}"`)
 				message.channel.send(`${'```'}\nUsage:\n${Config.prefix}${name} ${command.help.args}\n${'```'}`).catch(console.error)
 			} else {
 				console.error(`Error during command "${name}":`)
