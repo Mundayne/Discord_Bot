@@ -82,6 +82,7 @@ class Handler {
 
 		let content = message.content.split(' ')
 		let name = content.splice(0, 1)[0].substring(Config.prefix.length)
+		if (!name) return
 		let cmds = { }
 		Object.values(_self.commands).forEach(c => { cmds = { ...cmds, ...c } })
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
