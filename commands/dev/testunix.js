@@ -1,15 +1,11 @@
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 
-exports.pre = async (client, message) => {}
-
 exports.run = async (client, message, args, pre) => {
 	let initialText = args.echo
 	let text = ''
 	for (let i = 0; i < args.repeat; i++) text += initialText
 	return message.author.send(text)
 }
-
-exports.post = async (client, message, result) => {}
 
 /*
 	This object is mostly equivalent to yargs-parser's options object (see: https://github.com/yargs/yargs-parser#requireyargs-parserargs-opts),

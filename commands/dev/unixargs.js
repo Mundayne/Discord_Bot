@@ -1,7 +1,5 @@
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 
-exports.pre = async (client, message) => {}
-
 exports.run = async (client, message, args, pre) => {
 	let parsed
 	try {
@@ -12,8 +10,6 @@ exports.run = async (client, message, args, pre) => {
 	delete parsed.opts
 	return message.channel.send('Options:```\n' + JSON.stringify(JSON.parse(args.opts), null, '\t') + '\n```\nParsed:```\n' + JSON.stringify(parsed, null, '\t') + '\n```')
 }
-
-exports.post = async (client, message, result) => {}
 
 exports.yargsOpts = {
 	string: ['opts'],

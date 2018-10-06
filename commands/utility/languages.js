@@ -2,8 +2,6 @@ const Language = require('../../src/models/Language.js')
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
-exports.pre = async (client, message) => {}
-
 exports.run = async (client, message, args, pre) => {
 	if (!(args.add || args.remove || args.list)) {
 		throw new UnixHelpError()
@@ -102,8 +100,6 @@ exports.run = async (client, message, args, pre) => {
 	}
 	return message.channel.send(text)
 }
-
-exports.post = async (client, message, result) => {}
 
 exports.yargsOpts = {
 	alias: {

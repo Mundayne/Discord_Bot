@@ -32,6 +32,22 @@ class Handler {
 						console.warn(`${name} already exists; skipping...`)
 					} else {
 						console.info(`Loaded command ${name}.`)
+						// generate default pre and post functions if the command does not have them
+						if (typeof command.pre !== 'function') {
+							if (group === 'moderation') {
+								command.pre = async (client, message) => {
+									let authorMember = await message.guild.fetchMember(message.author)
+									if (!authorMember.hasPermission('ADMINISTRATOR')) {
+										throw new InsufficientPermissionsError()
+									}
+								}
+							} else {
+								command.pre = async (client, message) => {}
+							}
+						}
+						if (typeof command.post !== 'function') {
+							command.post = async (client, message, result) => {}
+						}
 						this.commands[group][name] = command
 					}
 				})

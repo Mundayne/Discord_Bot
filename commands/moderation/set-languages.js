@@ -1,13 +1,6 @@
 const Language = require('../../src/models/Language.js')
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
-const { InsufficientPermissionsError, UnixHelpError } = require('../../src/errors')
-
-exports.pre = async (client, message) => {
-	let authorMember = await message.guild.fetchMember(message.author)
-	if (!authorMember.hasPermission('ADMINISTRATOR')) {
-		throw new InsufficientPermissionsError()
-	}
-}
+const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
 exports.run = async (client, message, args, pre) => {
 	if (!(args.create || args.delete || args.list)) {
@@ -71,8 +64,6 @@ exports.run = async (client, message, args, pre) => {
 	}
 	return message.channel.send(text)
 }
-
-exports.post = async (client, message, result) => {}
 
 exports.yargsOpts = {
 	alias: {
