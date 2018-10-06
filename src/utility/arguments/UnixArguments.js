@@ -38,7 +38,7 @@ class UnixArguments {
 			if (!argString) continue
 			if (opts.default[arg].description) {
 				argStringsMap.set(arg, `${argString}={${opts.default[arg].description}}`)
-			} else if (argString.includes(':string')) {
+			} else if (typeof opts.default[arg] === 'string') {
 				argStringsMap.set(arg, `${argString}="${opts.default[arg]}"`)
 			} else {
 				argStringsMap.set(arg, `${argString}=${opts.default[arg]}`)
@@ -79,7 +79,7 @@ class UnixArguments {
 			if (e.default !== undefined) {
 				if (e.default.description) {
 					argString += `={${e.default.description}}`
-				} else if (e.type === 'string') {
+				} else if (typeof e.default === 'string') {
 					argString += `="${e.default}"`
 				} else {
 					argString += `=${e.default}`
