@@ -72,9 +72,29 @@ class UnixArguments {
 			}
 		}
 
+		// positional arguments
+		let positionalRequired = (opts.positional && opts.positional.required) || 0
+		let positionalArgStrings = ((opts.positional && opts.positional.args) || []).map((e, i) => {
+			let argString = `${e.name}:${e.type}`
+			if (e.default !== undefined) {
+				if (e.default.description) {
+					argString += `={${e.default.description}}`
+				} else if (e.type === 'string') {
+					argString += `="${e.default}"`
+				} else {
+					argString += `=${e.default}`
+				}
+			}
+			if (i < positionalRequired) {
+				return `<${argString}>`
+			} else {
+				return `[${argString}]`
+			}
+		})
+
 		/*
 			put everthing together in this order:
-			required groups, required single args, optional groups, optional single args
+			required groups, required single args, optional groups, optional single args, positional args
 			arguments within each category are sorted alphabetically
 		*/
 		let usageInfo = []
@@ -90,6 +110,7 @@ class UnixArguments {
 		for (let arg of singleArgStrings.filter(e => e.startsWith('[')).sort()) {
 			usageInfo.push(arg)
 		}
+		usageInfo.push(...positionalArgStrings)
 		return usageInfo.join(' ')
 	}
 
@@ -236,6 +257,62 @@ class UnixArguments {
 			if (parsed[arg] !== undefined && opts.narg[arg] > 1 && (!Array.isArray(parsed[arg]) || parsed[arg].length !== opts.narg[arg])) {
 				throw new UnixArgumentError({ error: 'narg', args: [arg], expected: opts.narg[arg] })
 			}
+		}
+
+		// validate positional arguments
+		if (opts.positional && opts.positional.args) {
+			opts.positional.args.forEach((e, i) => {
+				if (parsed._[i] === undefined) {
+					// check requiredness
+					if (i < opts.positional.required) throw new UnixArgumentError({ error: 'required', args: [e.name] })
+					// assign default value
+					if (e.default && !e.default.description) {
+						parsed._[i] = e.default
+					}
+				} else {
+					// validate type
+					switch (e.type) {
+					case 'boolean': {
+						if (String(parsed._[i]) === 'true' || String(parsed._[i]) === '1') {
+							parsed._[i] = true
+						} else if (String(parsed._[i]) === 'false' || String(parsed._[i]) === '0') {
+							parsed._[i] = false
+						} else {
+							throw new UnixArgumentError({ error: 'type', args: [e.name], expected: 'boolean' })
+						}
+						break
+					}
+					case 'float':
+					case 'number': {
+						parsed._[i] = Number(parsed._[i])
+						if (Number.isNaN(parsed._[i])) {
+							throw new UnixArgumentError({ error: 'type', args: [e.name], expected: e.type })
+						}
+						break
+					}
+					case 'integer': {
+						parsed._[i] = Number(parsed._[i])
+						if (Number.isNaN(parsed._[i]) || parsed._[i] !== Math.trunc(parsed._[i])) {
+							throw new UnixArgumentError({ error: 'type', args: [e.name], expected: 'integer' })
+						}
+						break
+					}
+					case 'channel': {
+						parsed._[i] = this._coerceChannel(String(parsed._[i]))
+						break
+					}
+					case 'user': {
+						parsed._[i] = this._coerceUser(String(parsed._[i]))
+						break
+					}
+					case 'string': {
+						parsed._[i] = String(parsed._[i])
+						break
+					}
+					}
+				}
+				if (parsed[e.name] === undefined) parsed[e.name] = parsed._[i]
+			})
 		}
 
 		return parsed
