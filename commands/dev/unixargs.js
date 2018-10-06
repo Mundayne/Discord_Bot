@@ -12,7 +12,7 @@ exports.run = async (client, message, args, pre) => {
 		return message.channel.send('Error:```\n' + err + '\n```')
 	}
 	delete parsed.opts
-	return message.channel.send('Options:```\n' + JSON.stringify(JSON.parse(args.opts), null, '\t') + '\n```\nParsed:```\n' + JSON.stringify(parsed, null, '\t') + '\n```')
+	return message.channel.send('Options:```\n' + JSON.stringify(JSON.parse(args.opts), null, '\t') + '\n```\nUsage:```\n' + UnixArguments.generateUsage(JSON.parse(args.opts)) + '\n```\nParsed:```\n' + JSON.stringify(parsed, null, '\t') + '\n```')
 }
 
 exports.post = async (client, message, result) => {
