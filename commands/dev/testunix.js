@@ -18,10 +18,13 @@ exports.run = async (client, message, args, pre) => {
 	Passing an object with a "description" property as a default value will treat it not as a literal value, but a description of a default value
 	that's computed at runtime. It is the command implementer's responsibility to actually compute and set that value, as the parser cannot do that.
 
-	Additional supported fields are "required" and "exclusive".
+	Additional supported fields are "required", "exclusive" and "positional".
 	- "required" is an array of strings listing all arguments that must be present. Any argument not listed is assumed to be optional.
 	- "exclusive" is an array of arrays of strings, listing groups of mutually exclusive arguments. Listing one or more arguments of a
 	group as required will mean the entire group is required.
+	- "positional" is an object with the format { args: [{ name: String, type: String, required: Boolean|Number|Object|String }], required: Number }.
+	(The "default" field is optional.) It is used to define any positional arguments the command takes. Positional arguments will be available using
+	the name given, but they will also still be available via the "_" array.
 
 	Lastly, the --help argument is reserved. If it (or any alias of it) is used, the command is not executed, and its usage information is
 	displayed instead.
