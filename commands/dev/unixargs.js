@@ -1,9 +1,5 @@
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 
-exports.pre = async (client, message) => {
-	console.log('UNIX argument parser test command run by ' + message.author.username)
-}
-
 exports.run = async (client, message, args, pre) => {
 	let parsed
 	try {
@@ -13,10 +9,6 @@ exports.run = async (client, message, args, pre) => {
 	}
 	delete parsed.opts
 	return message.channel.send('Options:```\n' + JSON.stringify(JSON.parse(args.opts), null, '\t') + '\n```\nParsed:```\n' + JSON.stringify(parsed, null, '\t') + '\n```')
-}
-
-exports.post = async (client, message, result) => {
-	console.log('UNIX argument parser test command complete!')
 }
 
 exports.yargsOpts = {
@@ -29,6 +21,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['unixargs'],
 	group: 'dev',
-	description: 'A command to test the UNIX argument parsing.',
-	args: UnixArguments.generateUsage(exports.yargsOpts)
+	description: 'A command to test the UNIX argument parsing.'
 }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const FS = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
-const { ArgumentError, UnixArgumentError, UnixHelpError } = require('../errors')
+const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
 const Config = require('../../config')
 
 class Handler {
@@ -32,6 +32,26 @@ class Handler {
 						console.warn(`${name} already exists; skipping...`)
 					} else {
 						console.info(`Loaded command ${name}.`)
+						// generate default pre and post functions if the command does not have them
+						if (typeof command.pre !== 'function') {
+							if (group === 'moderation') {
+								command.pre = async (client, message) => {
+									let authorMember = await message.guild.fetchMember(message.author)
+									if (!authorMember.hasPermission('ADMINISTRATOR')) {
+										throw new InsufficientPermissionsError()
+									}
+								}
+							} else {
+								command.pre = async (client, message) => {}
+							}
+						}
+						if (typeof command.post !== 'function') {
+							command.post = async (client, message, result) => {}
+						}
+						// generate usage information if the command uses the unix parser and does not have any
+						if (command.yargsOpts && command.help.args === undefined) {
+							command.help.args = UnixArguments.generateUsage(command.yargsOpts)
+						}
 						this.commands[group][name] = command
 					}
 				})
@@ -62,21 +82,32 @@ class Handler {
 
 		let content = message.content.split(' ')
 		let name = content.splice(0, 1)[0].substring(Config.prefix.length)
+		if (!name) return
 		let cmds = { }
 		Object.values(_self.commands).forEach(c => { cmds = { ...cmds, ...c } })
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
-			const args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
+			console.log(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
 			let pre = await command.pre(this, message)
+			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let result = await command.run(this, message, args, pre)
 			await command.post(this, message, result)
+			console.log(`Command "${name}" complete`)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
+				console.log(`Invalid arguments given for command "${name}"`)
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
+			} else if (e instanceof InsufficientPermissionsError) {
+				console.log(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
+				message.reply('you are not authorized to use this command.').then(m => m.delete(8000)).catch(console.error)
+			} else if (e instanceof PreCheckFailedError) {
+				console.log(`Pre-Check failed for command "${name}", reason: ${e.message}`)
 			} else if (e instanceof UnixArgumentError) {
+				console.log(`Invalid arguments given for command "${name}"`)
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof UnixHelpError) {
+				console.log(`Sending usage information for command "${name}"`)
 				message.channel.send(`${'```'}\nUsage:\n${Config.prefix}${name} ${command.help.args}\n${'```'}`).catch(console.error)
 			} else {
 				console.error(`Error during command "${name}":`)

@@ -1,18 +1,8 @@
-const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
-
-exports.pre = async (client, message) => {
-	console.log('Test command (UNIX) run by ' + message.author.username)
-}
-
 exports.run = async (client, message, args, pre) => {
 	let initialText = args.echo
 	let text = ''
 	for (let i = 0; i < args.repeat; i++) text += initialText
 	return message.author.send(text)
-}
-
-exports.post = async (client, message, result) => {
-	console.log('Test command (UNIX) complete!')
 }
 
 /*
@@ -51,6 +41,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['testunix'],
 	group: 'dev',
-	description: 'A test command with UNIX-style arguments.',
-	args: UnixArguments.generateUsage(exports.yargsOpts)
+	description: 'A test command with UNIX-style arguments.'
 }
