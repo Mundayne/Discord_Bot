@@ -6,8 +6,6 @@ function remind (channel, msg, author) {
 
 exports.run = async (client, message, args, pre) => {
 	let delay = 0
-	args.delay = message.toString().substring(9, message.toString().indexOf('"') - 1)
-	args.message = message.toString().substring(message.toString().indexOf('"') + 1, message.toString().lastIndexOf('"'))
 
 	if (args.delay.includes('s')) {
 		let seconds = args.delay.substring(0, args.delay.indexOf('s'))
