@@ -20,6 +20,7 @@ exports.run = async (client, message, args, pre) => {
 	} else {
 		embed.setTitle('Command List')
 		for (let group in client.commands) {
+			if (group === 'dev') continue
 			let uniqueCommands = Array.from(new Set(Object.values(client.commands[group])).values())
 			let text = ''
 			for (let command of uniqueCommands) {
