@@ -1,16 +1,7 @@
 const Language = require('../../src/models/Language.js')
-const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
-exports.pre = async (client, message) => {
-	console.log('Command "set-languages" run by ' + message.author.username)
-}
-
 exports.run = async (client, message, args, pre) => {
-	let authorMember = await message.guild.fetchMember(message.author)
-	if (!authorMember.hasPermission('ADMINISTRATOR')) {
-		return message.reply('you are not authorized to use this command.')
-	}
 	if (!(args.create || args.delete || args.list)) {
 		throw new UnixHelpError()
 	}
@@ -73,10 +64,6 @@ exports.run = async (client, message, args, pre) => {
 	return message.channel.send(text)
 }
 
-exports.post = async (client, message, result) => {
-	console.log('Command "set-languages" complete!')
-}
-
 exports.yargsOpts = {
 	alias: {
 		create: ['c', 'add', 'a'],
@@ -89,6 +76,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['set-languages'],
 	group: 'moderation',
-	description: 'Command to manage the available programming langage roles.',
-	args: UnixArguments.generateUsage(exports.yargsOpts)
+	description: 'Manage the available programming langage roles.'
 }

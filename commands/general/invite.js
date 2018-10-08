@@ -15,6 +15,6 @@ exports.post = async (client, message, result) => {
 exports.help = {
 	name: ['invite'],
 	group: 'general',
-	description: 'Shows the official invite for the Discord_Bots server.',
+	description: 'Show the official invite for the /r/Discord_Bots server.',
 	args: UnixArguments.generateUsage(exports.yargsOpts)
 }

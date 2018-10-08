@@ -1,10 +1,5 @@
 const Language = require('../../src/models/Language.js')
-const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
-
-exports.pre = async (client, message) => {
-	console.log('Command "languages" run by ' + message.author.username)
-}
 
 exports.run = async (client, message, args, pre) => {
 	if (!(args.add || args.remove || args.list)) {
@@ -105,10 +100,6 @@ exports.run = async (client, message, args, pre) => {
 	return message.channel.send(text)
 }
 
-exports.post = async (client, message, result) => {
-	console.log('Command "languages" complete!')
-}
-
 exports.yargsOpts = {
 	alias: {
 		add: ['a'],
@@ -123,6 +114,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['languages'],
 	group: 'utility',
-	description: 'Command to manage your programming language roles.',
-	args: UnixArguments.generateUsage(exports.yargsOpts)
+	description: 'Manage your programming language roles.'
 }
