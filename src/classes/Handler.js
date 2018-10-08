@@ -8,6 +8,7 @@ class Handler {
 	constructor (client) {
 		let _self = this
 		this.commands = { }
+		this.prefix = Config.prefix
 
 		this.client = client
 		client.on('message', message => _self.message(_self, message))
@@ -78,10 +79,10 @@ class Handler {
 		// Non-handling cases
 		if (message.author.bot) return
 		if (message.channel.type !== 'text') return
-		if (message.content.substring(0, Config.prefix.length) !== Config.prefix) return
+		if (message.content.substring(0, this.prefix.length) !== this.prefix) return
 
 		let content = message.content.split(' ')
-		let name = content.splice(0, 1)[0].substring(Config.prefix.length)
+		let name = content.splice(0, 1)[0].substring(this.prefix.length)
 		if (!name) return
 		let cmds = { }
 		Object.values(_self.commands).forEach(c => { cmds = { ...cmds, ...c } })
@@ -90,7 +91,7 @@ class Handler {
 		try {
 			console.log(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
 			let pre = await command.pre(this, message)
-			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(Config.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
+			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(this.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let result = await command.run(this, message, args, pre)
 			await command.post(this, message, result)
 			console.log(`Command "${name}" complete`)
@@ -108,7 +109,7 @@ class Handler {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof UnixHelpError) {
 				console.log(`Sending usage information for command "${name}"`)
-				message.channel.send(`${'```'}\nUsage:\n${Config.prefix}${name} ${command.help.args}\n${'```'}`).catch(console.error)
+				message.channel.send(`${'```'}\nUsage:\n${this.prefix}${name} ${command.help.args}\n${'```'}`).catch(console.error)
 			} else {
 				console.error(`Error during command "${name}":`)
 				console.error(e)
