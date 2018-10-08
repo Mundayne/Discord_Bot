@@ -11,6 +11,7 @@ class Handler {
 		this.prefix = Config.prefix
 
 		this.client = client
+		client.on('ready', () => _self.ready(_self))
 		client.on('message', message => _self.message(_self, message))
 		client.on('guildMemberAdd', member => _self.guildMemberAdd(_self, member))
 
@@ -73,6 +74,11 @@ class Handler {
 			console.error(err)
 			process.exit(1)
 		}
+	}
+
+	async ready (_self) {
+		console.log('Ready.')
+		await this.client.user.setActivity(`${this.prefix}help`)
 	}
 
 	async message (_self, message) {
