@@ -25,6 +25,7 @@ class Handler {
 		let count = { groups: 0, commands: 0 }
 
 		groups.forEach(group => {
+			if (group === 'dev' && process.env.NODE_ENV === 'production') return
 			this.commands[group] = { }
 			commands = FS.readdirSync(`./commands/${group}`)
 			commands.forEach(cmd => {
