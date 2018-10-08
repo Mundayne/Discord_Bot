@@ -44,5 +44,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['testunix'],
 	group: 'dev',
-	description: 'A test command with UNIX-style arguments.'
+	description: 'A test command with Unix-style arguments.'
 }

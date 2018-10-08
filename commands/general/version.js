@@ -9,5 +9,5 @@ exports.yargsOpts = {}
 exports.help = {
 	name: ['version'],
 	group: 'general',
-	description: 'Shows the bot\'s version.'
+	description: 'Show the bot\'s version.'
 }
