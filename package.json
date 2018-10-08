@@ -1,6 +1,6 @@
 {
   "name": "discord_bots",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A bot made for the /r/Discord_Bots Discord server.",
   "main": "index.js",
   "scripts": {
