@@ -114,5 +114,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['languages'],
 	group: 'utility',
-	description: 'Command to manage your programming language roles.'
+	description: 'Manage your programming language roles.'
 }

@@ -21,5 +21,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['unixargs'],
 	group: 'dev',
-	description: 'A command to test the UNIX argument parsing.'
+	description: 'Test the Unix-style argument parsing.'
 }
