@@ -32,7 +32,11 @@ exports.run = async (client, message, args, pre) => {
 		delay += parseFloat(months.substring(months.lastIndexOf(' ') - 1)) * 2.628e+9
 	}
 
-	setTimeout(remind, delay, message.channel, args.message, message.author)
+	if (Number.isNaN(delay)) {
+		message.channel.send('Improper delay format.')
+	} else {
+		setTimeout(remind, delay, message.channel, args.message, message.author)
+	}
 }
 
 exports.yargsOpts = {
