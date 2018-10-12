@@ -1,6 +1,6 @@
 const Discord = require('discord.js')
 
-const { EMBED_DESCRIPTION_LIMIT } = require('../../src/constants/embedLimits')
+const { DESCRIPTION_LIMIT } = require('../../src/constants/embedLimits')
 
 exports.run = async (client, message, args, pre) => {
 	if (!args.message && !args.text && !args.link) {
@@ -72,8 +72,8 @@ exports.run = async (client, message, args, pre) => {
 		}
 	}
 
-	if (quoteText.length > EMBED_DESCRIPTION_LIMIT) {
-		quoteText = quoteText.slice(0, EMBED_DESCRIPTION_LIMIT - 1) + '…'
+	if (quoteText.length > DESCRIPTION_LIMIT) {
+		quoteText = quoteText.slice(0, DESCRIPTION_LIMIT - 1) + '…'
 	}
 	embed.setDescription(quoteText)
 
