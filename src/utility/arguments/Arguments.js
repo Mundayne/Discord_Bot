@@ -1,6 +1,6 @@
-const ArgumentRegex = /^[[<](\w+):(\w+)(?:=(.+))?[\]>]$/
+const argumentRegex = /^[[<](\w+):(\w+)(?:=(.+))?[\]>]$/
 
-const Types = require('./Types')
+const TYPES = require('./Types')
 const { ArgumentError } = require('../../errors')
 
 class Arguments {
@@ -17,7 +17,7 @@ class Arguments {
 		format.split(/(?<=>|]) (?=<|\[)/).forEach(arg => {
 			let name, type, _default
 			try {
-				[, name, type, _default] = ArgumentRegex.exec(arg)
+				[, name, type, _default] = argumentRegex.exec(arg)
 			} catch (err) {
 				throw new Error(`Invalid argument format string: "${arg}"`)
 			}
@@ -67,20 +67,20 @@ class Arguments {
 			else return result
 		}
 		// Parse values to correct types; see Types.js
-		if (Types.String.includes(format.type)) {
+		if (TYPES.String.includes(format.type)) {
 			result.argument[format.name] = value
 			result.success = true
-		} else if (Types.Integer.includes(format.type)) {
+		} else if (TYPES.Integer.includes(format.type)) {
 			if (!isNaN(value)) {
 				result.argument[format.name] = parseInt(value)
 				result.success = true
 			}
-		} else if (Types.Float.includes(format.type)) {
+		} else if (TYPES.Float.includes(format.type)) {
 			if (!isNaN(value)) {
 				result.argument[format] = parseFloat(value)
 				result.success = true
 			}
-		} else if (Types.Boolean.includes(format.type)) {
+		} else if (TYPES.Boolean.includes(format.type)) {
 			let val = value.toLowerCase()
 			if (val === 'true' || val === '1' || val === 'yes' || val === 'y') {
 				result.argument[format.name] = true

@@ -1,14 +1,14 @@
 const mongoose = require('mongoose')
-const FS = require('fs')
+const fs = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
 const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
-const Config = require('../../config')
+const CONFIG = require('../../config')
 
 class Handler {
 	constructor (client) {
 		let _self = this
 		this.commands = { }
-		this.prefix = Config.prefix
+		this.prefix = CONFIG.prefix
 
 		this.client = client
 		client.on('ready', () => _self.ready(_self))
@@ -19,14 +19,14 @@ class Handler {
 	}
 
 	loadCommands () {
-		let groups = FS.readdirSync('./commands')
+		let groups = fs.readdirSync('./commands')
 		let commands
 		let command
 		let count = { groups: 0, commands: 0 }
 
 		groups.forEach(group => {
 			this.commands[group] = { }
-			commands = FS.readdirSync(`./commands/${group}`)
+			commands = fs.readdirSync(`./commands/${group}`)
 			commands.forEach(cmd => {
 				command = require(`../../commands/${group}/${cmd}`)
 				command.help.name.forEach(name => {
@@ -66,9 +66,9 @@ class Handler {
 
 	async start () {
 		try {
-			await mongoose.connect(Config.database, { useNewUrlParser: true })
-			await this.client.login(Config.token)
-			process.title = Config.procName
+			await mongoose.connect(CONFIG.database, { useNewUrlParser: true })
+			await this.client.login(CONFIG.token)
+			process.title = CONFIG.procName
 		} catch (err) {
 			console.error('Fatal error while starting bot:')
 			console.error(err)
