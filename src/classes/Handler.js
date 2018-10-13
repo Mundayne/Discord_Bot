@@ -6,14 +6,13 @@ const CONFIG = require('../../config')
 
 class Handler {
 	constructor (client) {
-		let _self = this
 		this.commands = { }
 		this.prefix = CONFIG.prefix
-
 		this.client = client
-		client.on('ready', () => _self.ready(_self))
-		client.on('message', message => _self.message(_self, message))
-		client.on('guildMemberAdd', member => _self.guildMemberAdd(_self, member))
+
+		client.on('ready', () => this.ready())
+		client.on('message', message => this.message(message))
+		client.on('guildMemberAdd', member => this.guildMemberAdd(member))
 
 		this.loadCommands()
 	}
@@ -76,12 +75,12 @@ class Handler {
 		}
 	}
 
-	async ready (_self) {
+	async ready () {
 		console.log('Ready.')
 		await this.client.user.setActivity(`${this.prefix}help`)
 	}
 
-	async message (_self, message) {
+	async message (message) {
 		// Non-handling cases
 		if (message.author.bot) return
 		if (message.channel.type !== 'text') return
@@ -91,7 +90,7 @@ class Handler {
 		let name = content.splice(0, 1)[0].substring(this.prefix.length)
 		if (!name) return
 		let cmds = { }
-		Object.values(_self.commands).forEach(c => { cmds = { ...cmds, ...c } })
+		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
@@ -123,7 +122,7 @@ class Handler {
 		}
 	}
 
-	guildMemberAdd (_self, member) {
+	guildMemberAdd (member) {
 
 	}
 }
