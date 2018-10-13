@@ -1,7 +1,7 @@
 const Language = require('../../src/models/Language.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	if (!(args.create || args.delete || args.list)) {
 		throw new UnixHelpError()
 	}

@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 
 const { DESCRIPTION_LIMIT } = require('../../src/constants/embedLimits')
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	if (!args.message && !args.text && !args.link) {
 		return message.reply('must provide either "link", "message" or "text" argument.')
 	}

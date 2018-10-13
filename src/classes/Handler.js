@@ -36,18 +36,18 @@ class Handler {
 						// generate default pre and post functions if the command does not have them
 						if (typeof command.pre !== 'function') {
 							if (group === 'moderation') {
-								command.pre = async (client, message) => {
+								command.pre = async (handler, message) => {
 									let authorMember = await message.guild.fetchMember(message.author)
 									if (!authorMember.hasPermission('ADMINISTRATOR')) {
 										throw new InsufficientPermissionsError()
 									}
 								}
 							} else {
-								command.pre = async (client, message) => {}
+								command.pre = async (handler, message) => {}
 							}
 						}
 						if (typeof command.post !== 'function') {
-							command.post = async (client, message, result) => {}
+							command.post = async (handler, message, result) => {}
 						}
 						// generate usage information if the command uses the unix parser and does not have any
 						if (command.yargsOpts && command.help.args === undefined) {

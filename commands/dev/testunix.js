@@ -1,4 +1,4 @@
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	let initialText = args.echo
 	let text = ''
 	for (let i = 0; i < args.repeat; i++) text += initialText

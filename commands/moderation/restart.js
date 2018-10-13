@@ -1,6 +1,6 @@
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	console.log('Restarting via commmand')
-	await client.client.destroy()
+	await handler.client.destroy()
 	process.exit(2)
 }
 

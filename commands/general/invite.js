@@ -1,4 +1,4 @@
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	return message.channel.send(`https://discord.gg/xRFmHYQ`)
 }
 
