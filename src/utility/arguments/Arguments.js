@@ -1,7 +1,7 @@
-const argumentRegex = /^[[<](\w+):(\w+)(?:=(.+))?[\]>]$/
-
 const TYPES = require('./Types')
 const { ArgumentError } = require('../../errors')
+
+const argumentRegex = /^[[<](\w+):(\w+)(?:=(.+))?[\]>]$/
 
 class Arguments {
 	static parse (format, raw) {
