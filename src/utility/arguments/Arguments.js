@@ -34,20 +34,20 @@ class Arguments {
 		let result
 		let repeat
 		let passed = raw.split(' ')
-		argFormats.forEach((format, i) => {
+		argFormats.forEach((argFormat, i) => {
 			do {
 				repeat = false
-				result = Arguments.parseArgument(passed[i], format)
+				result = Arguments.parseArgument(passed[i], argFormat)
 				if (!result.success) {
 					/*
 						If the argument was optional, perhaps this value is intended to be
 						the next argument's
 					*/
-					if (!format.required && argFormats[i + 1] && argFormats[i + 1].type.includes(typeof passed[i])) {
+					if (!argFormat.required && argFormats[i + 1] && argFormats[i + 1].type.includes(typeof passed[i])) {
 						repeat = true
 						i++
 					} else {
-						throw new ArgumentError(format, passed[i])
+						throw new ArgumentError(argFormat, passed[i])
 					}
 					// Merge the new argument into the argument map
 				} else args = { ...args, ...result.argument }

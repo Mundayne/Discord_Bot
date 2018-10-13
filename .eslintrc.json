@@ -3,6 +3,8 @@
 	"rules": {
 		"indent": ["error", "tab"],
 		"no-tabs": "off",
+		"no-shadow": ["error", { "builtinGlobals": true }],
+		"no-shadow-restricted-names": "error",
 		"no-warning-comments": "warn"
 	}
 }
