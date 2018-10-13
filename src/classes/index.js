@@ -1,4 +1,3 @@
 module.exports = {
-	Bot: require('./Bot'),
-	Config: require('./Config')
+	Handler: require('./Handler')
 }
