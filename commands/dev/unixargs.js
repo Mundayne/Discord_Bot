@@ -1,6 +1,6 @@
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	let parsed
 	try {
 		parsed = UnixArguments.parse(JSON.parse(args.opts), message.content.slice('?unixargs'.length).trim())

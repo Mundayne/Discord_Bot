@@ -1,6 +1,6 @@
 const VERSION = require('../../package.json').version
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	return message.channel.send(`v${VERSION}`)
 }
 

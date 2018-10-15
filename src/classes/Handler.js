@@ -1,32 +1,31 @@
 const mongoose = require('mongoose')
-const FS = require('fs')
+const fs = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
 const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
-const Config = require('../../config')
+const CONFIG = require('../../config')
 
 class Handler {
 	constructor (client) {
-		let _self = this
 		this.commands = { }
-		this.prefix = Config.prefix
-
+		this.prefix = CONFIG.prefix
 		this.client = client
-		client.on('ready', () => _self.ready(_self))
-		client.on('message', message => _self.message(_self, message))
-		client.on('guildMemberAdd', member => _self.guildMemberAdd(_self, member))
+
+		client.on('ready', () => this.ready())
+		client.on('message', message => this.message(message))
+		client.on('guildMemberAdd', member => this.guildMemberAdd(member))
 
 		this.loadCommands()
 	}
 
 	loadCommands () {
-		let groups = FS.readdirSync('./commands')
+		let groups = fs.readdirSync('./commands')
 		let commands
 		let command
 		let count = { groups: 0, commands: 0 }
 
 		groups.forEach(group => {
 			this.commands[group] = { }
-			commands = FS.readdirSync(`./commands/${group}`)
+			commands = fs.readdirSync(`./commands/${group}`)
 			commands.forEach(cmd => {
 				command = require(`../../commands/${group}/${cmd}`)
 				command.help.name.forEach(name => {
@@ -37,18 +36,18 @@ class Handler {
 						// generate default pre and post functions if the command does not have them
 						if (typeof command.pre !== 'function') {
 							if (group === 'moderation') {
-								command.pre = async (client, message) => {
+								command.pre = async (handler, message) => {
 									let authorMember = await message.guild.fetchMember(message.author)
 									if (!authorMember.hasPermission('ADMINISTRATOR')) {
 										throw new InsufficientPermissionsError()
 									}
 								}
 							} else {
-								command.pre = async (client, message) => {}
+								command.pre = async (handler, message) => {}
 							}
 						}
 						if (typeof command.post !== 'function') {
-							command.post = async (client, message, result) => {}
+							command.post = async (handler, message, result) => {}
 						}
 						// generate usage information if the command uses the unix parser and does not have any
 						if (command.yargsOpts && command.help.args === undefined) {
@@ -66,9 +65,9 @@ class Handler {
 
 	async start () {
 		try {
-			await mongoose.connect(Config.database, { useNewUrlParser: true })
-			await this.client.login(Config.token)
-			process.title = Config.procName
+			await mongoose.connect(CONFIG.database, { useNewUrlParser: true })
+			await this.client.login(CONFIG.token)
+			process.title = CONFIG.procName
 		} catch (err) {
 			console.error('Fatal error while starting bot:')
 			console.error(err)
@@ -76,12 +75,12 @@ class Handler {
 		}
 	}
 
-	async ready (_self) {
+	async ready () {
 		console.log('Ready.')
 		await this.client.user.setActivity(`${this.prefix}help`)
 	}
 
-	async message (_self, message) {
+	async message (message) {
 		// Non-handling cases
 		if (message.author.bot) return
 		if (message.channel.type !== 'text') return
@@ -91,7 +90,7 @@ class Handler {
 		let name = content.splice(0, 1)[0].substring(this.prefix.length)
 		if (!name) return
 		let cmds = { }
-		Object.values(_self.commands).forEach(c => { cmds = { ...cmds, ...c } })
+		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
 		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
@@ -123,7 +122,7 @@ class Handler {
 		}
 	}
 
-	guildMemberAdd (_self, member) {
+	guildMemberAdd (member) {
 
 	}
 }
