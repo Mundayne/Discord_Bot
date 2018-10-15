@@ -8,7 +8,7 @@ The bot's command parser uses yargs-parser at its core, and as such the `yargsOp
 
 ### Argument Types
 
-All of yargs-parser's types (array, boolean, number, string) are supported, however array argumentss are always treated as strings.
+All of yargs-parser's types (array, boolean, number, string) are supported, however array arguments are always treated as strings.
 
 For numbers, additional supported types are "integer" and "float". The "integer" type will accept only whole numbers (although this includes numbers like `12.0`). The "float" type is semantically equivalent to "number", and merely emphasizes that non-integer values are allowed.
 
