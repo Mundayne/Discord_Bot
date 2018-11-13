@@ -1,3 +1,4 @@
 module.exports = {
-	Handler: require('./Handler')
+	Handler: require('./Handler'),
+	Help: require('./Help')
 }
