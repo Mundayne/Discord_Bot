@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const fs = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
 const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
+const Help = require('./Help')
 const CONFIG = require('../../config')
 
 class Handler {
@@ -9,6 +10,7 @@ class Handler {
 		this.commands = { }
 		this.prefix = CONFIG.prefix
 		this.client = client
+		this.help = new Help(this)
 
 		client.on('ready', () => this.ready())
 		client.on('message', message => this.message(message))
@@ -114,7 +116,8 @@ class Handler {
 				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
 			} else if (e instanceof UnixHelpError) {
 				console.log(`Sending usage information for command "${name}"`)
-				message.channel.send(`${'```'}\nUsage:\n${this.prefix}${name} ${command.help.args}\n${'```'}`).catch(console.error)
+				let embed = await this.help.commandHelp(message.guild, name)
+				message.channel.send(embed).catch(console.error)
 			} else {
 				console.error(`Error during command "${name}":`)
 				console.error(e)
