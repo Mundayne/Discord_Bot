@@ -82,6 +82,32 @@ class Handler {
 	async ready () {
 		console.log('Ready.')
 		await this.client.user.setActivity(`${this.prefix}help`)
+
+		// update member roles database
+		let saveOps = []
+		for (let guild of this.client.guilds.array()) {
+			await guild.fetchMembers()
+			let docs = await MemberRoles.find({ guildId: guild.id }).exec()
+
+			// don't change documents of members that aren't in the server
+			docs = docs.filter(e => guild.member(e.userId))
+
+			// create documents for not yet saved members
+			let newMembers = guild.members.array().filter(e => e.roles.size && !docs.find(d => d.userId === e.user.id))
+			for (let newMember of newMembers) {
+				docs.push(new MemberRoles({ guildId: guild.id, userId: newMember.user.id, roleIds: [] }))
+			}
+
+			for (let doc of docs) {
+				let memberRoleIds = guild.member(doc.userId).roles.filter(r => !r.managed && r.id !== r.guild.id).map(r => r.id).sort()
+				if (memberRoleIds.join() !== doc.roleIds.join()) {
+					doc.roleIds = memberRoleIds
+					saveOps.push(doc.save())
+				}
+			}
+		}
+		await Promise.all(saveOps)
+		console.log('Finished updating member roles database.')
 	}
 
 	async message (message) {
