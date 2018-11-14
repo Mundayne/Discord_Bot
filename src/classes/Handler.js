@@ -93,7 +93,7 @@ class Handler {
 			docs = docs.filter(e => guild.member(e.userId))
 
 			// create documents for not yet saved members
-			let newMembers = guild.members.array().filter(e => e.roles.size && !docs.find(d => d.userId === e.user.id))
+			let newMembers = guild.members.array().filter(e => !e.user.bot && e.roles.size && !docs.find(d => d.userId === e.user.id))
 			for (let newMember of newMembers) {
 				docs.push(new MemberRoles({ guildId: guild.id, userId: newMember.user.id, roleIds: [] }))
 			}
@@ -154,6 +154,8 @@ class Handler {
 	}
 
 	async guildMemberAdd (member) {
+		if (member.user.bot) return
+
 		let doc = await MemberRoles.findOne({ guildId: member.guild.id, userId: member.user.id }).exec()
 		if (doc) {
 			let rolesToAdd = []
@@ -171,6 +173,8 @@ class Handler {
 	}
 
 	async guildMemberUpdate (oldMember, newMember) {
+		if (newMember.user.bot) return
+
 		let oldMemberRoles = oldMember.roles.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
 		let newMemberRoles = newMember.roles.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
 
