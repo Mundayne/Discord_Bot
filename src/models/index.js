@@ -1,3 +1,4 @@
 module.exports = {
-	Language: require('./Language')
+	Language: require('./Language'),
+	MemberRoles: require('./MemberRoles')
 }

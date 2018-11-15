@@ -3,6 +3,7 @@ const fs = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
 const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
 const Help = require('./Help')
+const MemberRoles = require('../models/MemberRoles')
 const CONFIG = require('../../config')
 
 class Handler {
@@ -15,6 +16,7 @@ class Handler {
 		client.on('ready', () => this.ready())
 		client.on('message', message => this.message(message))
 		client.on('guildMemberAdd', member => this.guildMemberAdd(member))
+		client.on('guildMemberUpdate', (oldMember, newMember) => this.guildMemberUpdate(oldMember, newMember))
 
 		this.loadCommands()
 	}
@@ -80,6 +82,32 @@ class Handler {
 	async ready () {
 		console.log('Ready.')
 		await this.client.user.setActivity(`${this.prefix}help`)
+
+		// update member roles database
+		let saveOps = []
+		for (let guild of this.client.guilds.array()) {
+			await guild.fetchMembers()
+			let docs = await MemberRoles.find({ guildId: guild.id }).exec()
+
+			// don't change documents of members that aren't in the server
+			docs = docs.filter(e => guild.member(e.userId))
+
+			// create documents for not yet saved members
+			let newMembers = guild.members.array().filter(e => !e.user.bot && e.roles.size && !docs.find(d => d.userId === e.user.id))
+			for (let newMember of newMembers) {
+				docs.push(new MemberRoles({ guildId: guild.id, userId: newMember.user.id, roleIds: [] }))
+			}
+
+			for (let doc of docs) {
+				let memberRoleIds = guild.member(doc.userId).roles.filter(r => !r.managed && r.id !== r.guild.id).map(r => r.id).sort()
+				if (memberRoleIds.join() !== doc.roleIds.join()) {
+					doc.roleIds = memberRoleIds
+					saveOps.push(doc.save())
+				}
+			}
+		}
+		await Promise.all(saveOps)
+		console.log('Finished updating member roles database.')
 	}
 
 	async message (message) {
@@ -125,8 +153,37 @@ class Handler {
 		}
 	}
 
-	guildMemberAdd (member) {
+	async guildMemberAdd (member) {
+		if (member.user.bot) return
 
+		let doc = await MemberRoles.findOne({ guildId: member.guild.id, userId: member.user.id }).exec()
+		if (doc) {
+			let rolesToAdd = []
+			for (let roleId of doc.roleIds) {
+				let role = member.guild.roles.get(roleId)
+				if (role) {
+					rolesToAdd.push(role)
+				}
+			}
+			if (rolesToAdd.length) {
+				console.log(`${member.user.username} (${member.user.id}) rejoined, readding ${rolesToAdd.length} roles`)
+				member.addRoles(rolesToAdd).catch(console.error)
+			}
+		}
+	}
+
+	async guildMemberUpdate (oldMember, newMember) {
+		if (newMember.user.bot) return
+
+		let oldMemberRoles = oldMember.roles.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
+		let newMemberRoles = newMember.roles.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
+
+		if (oldMemberRoles.join() !== newMemberRoles.join()) {
+			let doc = await MemberRoles.findOne({ guildId: newMember.guild.id, userId: newMember.user.id }).exec()
+			doc = doc || new MemberRoles({ guildId: newMember.guild.id, userId: newMember.user.id })
+			doc.roleIds = newMemberRoles
+			doc.save().catch(console.error)
+		}
 	}
 }
 module.exports = Handler
