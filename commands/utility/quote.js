@@ -3,8 +3,8 @@ const Discord = require('discord.js')
 const { DESCRIPTION_LIMIT } = require('../../src/constants/embedLimits')
 
 exports.run = async (handler, message, args, pre) => {
-	if (!args.message && !args.text && !args.link) {
-		return message.reply('must provide either "link", "message" or "text" argument.')
+	if (!args.id && !args.text && !args.link) {
+		return message.reply('must provide either "id", "link" or "text" argument.')
 	}
 
 	let channel
@@ -26,10 +26,10 @@ exports.run = async (handler, message, args, pre) => {
 		if (!channel || channel.type !== 'text') {
 			return message.reply('"channel" must be a valid text channel.')
 		}
-		if (args.message) {
+		if (args.id) {
 			// get message by ID
 			try {
-				quoteMessage = await channel.fetchMessage(args.message)
+				quoteMessage = await channel.fetchMessage(args.id)
 			} catch (err) {
 				if (err.message.includes('snowflake')) {
 					return message.reply('invalid message ID.')
@@ -85,7 +85,7 @@ exports.yargsOpts = {
 		help: ['h'],
 		channel: ['c'],
 		link: ['l'],
-		message: ['m'],
+		id: ['i', 'm', 'message'],
 		next: ['n'],
 		text: ['t'],
 		user: ['u']
@@ -95,7 +95,7 @@ exports.yargsOpts = {
 	},
 	channel: ['channel'],
 	integer: ['next'],
-	string: ['message', 'text', 'link'],
+	string: ['id', 'text', 'link'],
 	user: ['user']
 }
 
