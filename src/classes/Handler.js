@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const logger = require('winston').loggers.get('default')
 const fs = require('fs')
 const { Arguments, UnixArguments } = require('../utility')
 const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixArgumentError, UnixHelpError } = require('../errors')
@@ -34,9 +35,9 @@ class Handler {
 				command = require(`../../commands/${group}/${cmd}`)
 				command.help.name.forEach(name => {
 					if (Object.keys(this.commands[group]).includes(name)) {
-						console.warn(`${name} already exists; skipping...`)
+						logger.warn(`${name} already exists; skipping...`)
 					} else {
-						console.info(`Loaded command ${name}.`)
+						logger.verbose(`Loaded command ${name}.`)
 						// generate default pre and post functions if the command does not have them
 						if (typeof command.pre !== 'function') {
 							if (group === 'moderation') {
@@ -64,7 +65,7 @@ class Handler {
 			})
 			count.groups++
 		})
-		console.info(`Done! ${count.commands} commands loaded across ${count.groups} groups.`)
+		logger.info(`Done! ${count.commands} commands loaded across ${count.groups} groups.`)
 	}
 
 	async start () {
@@ -73,17 +74,18 @@ class Handler {
 			await this.client.login(CONFIG.token)
 			process.title = CONFIG.procName
 		} catch (err) {
-			console.error('Fatal error while starting bot:')
-			console.error(err)
+			logger.fatal('Fatal error while starting bot:')
+			logger.fatal(err)
 			process.exit(1)
 		}
 	}
 
 	async ready () {
-		console.log('Ready.')
+		logger.info('Ready.')
 		await this.client.user.setActivity(`${this.prefix}help`)
 
 		// update member roles database
+		logger.debug('Updating member roles database.')
 		let saveOps = []
 		for (let guild of this.client.guilds.array()) {
 			await guild.fetchMembers()
@@ -107,7 +109,7 @@ class Handler {
 			}
 		}
 		await Promise.all(saveOps)
-		console.log('Finished updating member roles database.')
+		logger.info('Finished updating member roles database.')
 	}
 
 	async message (message) {
@@ -121,34 +123,34 @@ class Handler {
 		if (!name) return
 		let cmds = { }
 		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
-		if (!cmds.hasOwnProperty(name)) return console.warn(`Command ${name} not found.`)
+		if (!cmds.hasOwnProperty(name)) return logger.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
-			console.log(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
+			logger.info(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
 			let pre = await command.pre(this, message)
 			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(this.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
 			let result = await command.run(this, message, args, pre)
 			await command.post(this, message, result)
-			console.log(`Command "${name}" complete`)
+			logger.info(`Command "${name}" complete`)
 		} catch (e) {
 			if (e instanceof ArgumentError) {
-				console.log(`Invalid arguments given for command "${name}"`)
-				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
+				logger.info(`Invalid arguments given for command "${name}"`)
+				message.reply(e.message).then(m => m.delete(8000)).catch(logger.error)
 			} else if (e instanceof InsufficientPermissionsError) {
-				console.log(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
-				message.reply('you are not authorized to use this command.').then(m => m.delete(8000)).catch(console.error)
+				logger.warn(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
+				message.reply('you are not authorized to use this command.').then(m => m.delete(8000)).catch(logger.error)
 			} else if (e instanceof PreCheckFailedError) {
-				console.log(`Pre-Check failed for command "${name}", reason: ${e.message}`)
+				logger.warn(`Pre-Check failed for command "${name}", reason: ${e.message}`)
 			} else if (e instanceof UnixArgumentError) {
-				console.log(`Invalid arguments given for command "${name}"`)
-				message.reply(e.message).then(m => m.delete(8000)).catch(console.error)
+				logger.info(`Invalid arguments given for command "${name}"`)
+				message.reply(e.message).then(m => m.delete(8000)).catch(logger.error)
 			} else if (e instanceof UnixHelpError) {
-				console.log(`Sending usage information for command "${name}"`)
+				logger.info(`Sending usage information for command "${name}"`)
 				let embed = await this.help.commandHelp(message.guild, name)
-				message.channel.send(embed).catch(console.error)
+				message.channel.send(embed).catch(logger.error)
 			} else {
-				console.error(`Error during command "${name}":`)
-				console.error(e)
+				logger.error(`Error during command "${name}":`)
+				logger.error(e)
 			}
 		}
 	}
@@ -166,8 +168,8 @@ class Handler {
 				}
 			}
 			if (rolesToAdd.length) {
-				console.log(`${member.user.username} (${member.user.id}) rejoined, readding ${rolesToAdd.length} roles`)
-				member.addRoles(rolesToAdd).catch(console.error)
+				logger.info(`${member.user.username} (${member.user.id}) rejoined, readding ${rolesToAdd.length} roles`)
+				member.addRoles(rolesToAdd).catch(logger.error)
 			}
 		}
 	}
@@ -182,7 +184,7 @@ class Handler {
 			let doc = await MemberRoles.findOne({ guildId: newMember.guild.id, userId: newMember.user.id }).exec()
 			doc = doc || new MemberRoles({ guildId: newMember.guild.id, userId: newMember.user.id })
 			doc.roleIds = newMemberRoles
-			doc.save().catch(console.error)
+			doc.save().catch(logger.error)
 		}
 	}
 }

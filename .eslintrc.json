@@ -2,6 +2,7 @@
 	"extends": "standard",
 	"rules": {
 		"indent": ["error", "tab"],
+		"no-console": "error",
 		"no-tabs": "off",
 		"no-shadow": ["error", { "builtinGlobals": true }],
 		"no-shadow-restricted-names": "error",
