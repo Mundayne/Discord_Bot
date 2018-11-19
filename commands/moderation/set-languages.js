@@ -77,5 +77,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['set-languages'],
 	group: 'moderation',
-	description: 'Manage the available programming langage roles.'
+	description: 'Manage the available programming language roles.'
 }
