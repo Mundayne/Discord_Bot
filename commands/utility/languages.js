@@ -1,16 +1,20 @@
 const Language = require('../../src/models/Language.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	if (!(args.add || args.remove || args.list)) {
 		throw new UnixHelpError()
 	}
 
 	let availableLanguages = await Language.find({ guildId: message.guild.id }).exec()
 
+	// convert languages to lowercase
+	args.add = (args.add || []).map(e => e.toLowerCase())
+	args.remove = (args.remove || []).map(e => e.toLowerCase())
+
 	// remove duplicates
-	let languagesToAdd = Array.from(new Set(args.add || []).values())
-	let languagesToRemove = Array.from(new Set(args.remove || []).values())
+	let languagesToAdd = Array.from(new Set(args.add).values())
+	let languagesToRemove = Array.from(new Set(args.remove).values())
 
 	// remove items that are in both lists
 	for (let i = languagesToAdd.length - 1; i >= 0; --i) {
@@ -26,11 +30,11 @@ exports.run = async (client, message, args, pre) => {
 	let notAvailable = false
 
 	for (let lang of languagesToAdd) {
-		if (!availableLanguages.find(e => e.name === lang)) {
+		if (!availableLanguages.find(e => e.name.toLowerCase() === lang)) {
 			notAvailable = true
 			continue
 		}
-		let role = message.guild.roles.find(e => e.name === lang)
+		let role = message.guild.roles.find(e => e.name.toLowerCase() === lang)
 		if (!role) {
 			notAvailable = true
 			continue
@@ -38,11 +42,11 @@ exports.run = async (client, message, args, pre) => {
 		rolesToAdd.push(role)
 	}
 	for (let lang of languagesToRemove) {
-		if (!availableLanguages.find(e => e.name === lang)) {
+		if (!availableLanguages.find(e => e.name.toLowerCase() === lang)) {
 			notAvailable = true
 			continue
 		}
-		let role = message.guild.roles.find(e => e.name === lang)
+		let role = message.guild.roles.find(e => e.name.toLowerCase() === lang)
 		if (!role) {
 			notAvailable = true
 			continue

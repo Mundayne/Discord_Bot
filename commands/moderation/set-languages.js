@@ -1,7 +1,7 @@
 const Language = require('../../src/models/Language.js')
 const UnixHelpError = require('../../src/errors/UnixHelpError.js')
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	if (!(args.create || args.delete || args.list)) {
 		throw new UnixHelpError()
 	}
@@ -24,7 +24,7 @@ exports.run = async (client, message, args, pre) => {
 
 	// create languages
 	for (let lang of Array.from(new Set(args.add || []).values())) {
-		if (availableLanguages.find(e => e.name === lang)) {
+		if (availableLanguages.find(e => e.name.toLowerCase() === lang.toLowerCase())) {
 			// language already exists
 			continue
 		}
@@ -38,13 +38,14 @@ exports.run = async (client, message, args, pre) => {
 	}
 	// remove languages
 	for (let lang of Array.from(new Set(args.delete || []).values())) {
-		let language = availableLanguages.find(e => e.name === lang)
+		let language = availableLanguages.find(e => e.name.toLowerCase() === lang.toLowerCase())
 		if (!language) {
 			// language doesn't exist
 			continue
 		}
+		let actualName = language.name
 		await language.delete()
-		removedLanguages.push(lang)
+		removedLanguages.push(actualName)
 	}
 
 	let text = `${message.author}\n`
@@ -76,5 +77,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['set-languages'],
 	group: 'moderation',
-	description: 'Manage the available programming langage roles.'
+	description: 'Manage the available programming language roles.'
 }

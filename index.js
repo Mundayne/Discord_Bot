@@ -1,5 +1,9 @@
-const Discord = require('discord.js')
-const Client = new Discord.Client()
-const Handler = new (require('./src/classes/Handler'))(Client)
+require('./src/utility/configureLogger')
 
-Handler.start()
+const Discord = require('discord.js')
+const Handler = require('./src/classes/Handler')
+
+const client = new Discord.Client()
+const handler = new Handler(client)
+
+handler.start()

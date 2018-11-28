@@ -1,6 +1,6 @@
 const UnixArguments = require('../../src/utility/arguments/UnixArguments.js')
 
-exports.run = async (client, message, args, pre) => {
+exports.run = async (handler, message, args, pre) => {
 	let parsed
 	try {
 		parsed = UnixArguments.parse(JSON.parse(args.opts), message.content.slice('?unixargs'.length).trim())
@@ -8,7 +8,11 @@ exports.run = async (client, message, args, pre) => {
 		return message.channel.send('Error:```\n' + err + '\n```')
 	}
 	delete parsed.opts
-	return message.channel.send('Options:```\n' + JSON.stringify(JSON.parse(args.opts), null, '\t') + '\n```\nUsage:```\n' + UnixArguments.generateUsage(JSON.parse(args.opts)) + '\n```\nParsed:```\n' + JSON.stringify(parsed, null, '\t') + '\n```')
+
+	let optionsJson = JSON.stringify(JSON.parse(args.opts), null, '\t')
+	let usage = UnixArguments.generateUsage(JSON.parse(args.opts))
+	let parsedJson = JSON.stringify(parsed, null, '\t')
+	return message.channel.send(`Options:${'```'}\n${optionsJson}\n${'```'}\nUsage:${'```'}\n${usage || '\u200b'}\n${'```'}\nParsed:${'```'}\n${parsedJson}\n${'```'}`)
 }
 
 exports.yargsOpts = {
