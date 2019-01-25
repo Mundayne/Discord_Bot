@@ -77,7 +77,7 @@ exports.run = async (handler, message, args, pre) => {
 		quoteText = quoteText.slice(0, DESCRIPTION_LIMIT - quotePermalink.length - 1) + '…'
 	}
 	embed.setDescription(quoteText + quotePermalink)
-	
+
 	return message.channel.send({ embed })
 }
 
