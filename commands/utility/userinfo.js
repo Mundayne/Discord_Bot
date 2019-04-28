@@ -16,11 +16,7 @@ exports.run = async (handler, message, args, pre) => {
 	return message.channel.send({ embed })
 }
 
-exports.yargsOpts = {
-	alias: {
-		userinfo: ['ui']
-	}
-}
+exports.yargsOpts = {}
 
 exports.help = {
 	name: ['userinfo'],
