@@ -11,9 +11,15 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	embed.addField('Discriminator', member.user.discriminator, true)
-		.addField('Date Joined', member.joinedAt.toISOString().slice(0, -5) + 'Z', true)
+		.addField('Date Joined', `${member.joinedAt.toISOString().slice(0, -5)}Z`, true)
 
 	return message.channel.send({ embed })
+}
+
+exports.yargsOpts = {
+	alias: {
+		userinfo: ['ui']
+	}
 }
 
 exports.help = {
