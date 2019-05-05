@@ -10,7 +10,7 @@ exports.run = async (handler, message, args, pre) => {
 			user = await message.client.fetchUser(args.user)
 			try {
 				member = await message.guild.fetchMember(user)
-			}catch(exception){
+			} catch (exception) {
 				return message.channel.send('User is not in the server.')
 			}
 		} catch (exception) {
@@ -48,5 +48,5 @@ exports.yargsOpts = {
 exports.help = {
 	name: ['userinfo'],
 	group: 'utility',
-	description: 'Get information about yourself.'
+	description: 'Get information about someone or yourself.'
 }
