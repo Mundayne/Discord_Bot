@@ -20,7 +20,7 @@ exports.run = async (handler, message, args, pre) => {
 
 	const embed = new Discord.RichEmbed()
 		.setColor(member.displayColor || null)
-		.setAuthor(`${member.user.username}#${member.user.discriminator}`, member.user.avatarURL)
+		.setAuthor(`${member.user.tag}`, member.user.avatarURL)
 
 	if (member.nickname) {
 		embed.addField('Nickname', member.nickname, true)
