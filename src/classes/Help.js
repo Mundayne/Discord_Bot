@@ -20,11 +20,12 @@ class Help {
 		return embed
 	}
 
-	async commandList (guild) {
+	async commandList (guild, isAdmin) {
 		let embed = await this._baseEmbed(guild)
 		embed.setTitle('Command List')
 		for (let group in this.handler.commands) {
 			if (group === 'dev') continue
+			if (group === 'moderation' && !isAdmin) continue
 			let uniqueCommands = Array.from(new Set(Object.values(this.handler.commands[group])).values())
 			let text = ''
 			for (let command of uniqueCommands) {
