@@ -1,3 +1,4 @@
+const Discord = require('discord.js')
 const mongoose = require('mongoose')
 const logger = require('winston').loggers.get('default')
 const fs = require('fs')
@@ -16,6 +17,7 @@ class Handler {
 
 		client.on('ready', () => this.ready())
 		client.on('message', message => this.message(message))
+		client.on('messageDelete', message => this.messageDelete(message))
 		client.on('guildMemberAdd', member => this.guildMemberAdd(member))
 		client.on('guildMemberUpdate', (oldMember, newMember) => this.guildMemberUpdate(oldMember, newMember))
 
@@ -152,6 +154,25 @@ class Handler {
 				logger.error(`Error during command "${name}":`)
 				logger.error(e)
 			}
+		}
+	}
+
+	async messageDelete (message) {
+		let eventTime = new Date()
+		try {
+			let logChannel = message.guild.channels.find(e => e.name === 'message-deletions')
+			if (!logChannel) throw new Error(`No logging channel for message deletions found in guild "${message.guild.name}"`)
+			if (message.channel.id === logChannel.id) return
+			let embed = new Discord.RichEmbed()
+				.setColor(message.member.displayColor || null)
+				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL)
+				.setDescription(message.content)
+				.addField('Channel', `${message.channel} (#${message.channel.name})`)
+				.setTimestamp(eventTime)
+			await logChannel.send({ embed })
+		} catch (err) {
+			logger.error('Error while logging message deletion:')
+			logger.error(err)
 		}
 	}
 
