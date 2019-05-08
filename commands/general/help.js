@@ -7,7 +7,7 @@ exports.run = async (handler, message, args, pre) => {
 		}
 		await message.channel.send(embed)
 	} else {
-		let embed = await handler.help.commandList(message.guild)
+		let embed = await handler.help.commandList(message.guild, message.member.hasPermission('ADMINISTRATOR'))
 		await message.channel.send(embed)
 	}
 }
