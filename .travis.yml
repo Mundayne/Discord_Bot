@@ -1,0 +1,9 @@
+dist: xenial
+language: node_js
+node_js:
+  - 11
+cache: npm
+
+install: npm install
+script:
+  - npx eslint --max-warnings=0 .
