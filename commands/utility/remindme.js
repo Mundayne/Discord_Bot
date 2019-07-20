@@ -1,15 +1,32 @@
+const Reminder = require('../../src/models/Reminders.js')
+
 exports.run = async (handler, message, args, pre) => {
-	if (!args.hours && !args.minutes && !args.seconds) {
+	if (!args.days && !args.hours && !args.minutes && !args.seconds) {
 		return message.channel.send('Days, hours, minutes, or seconds argument must be given.')
 	}
 
-	var time = ((args.days ? args.days : 0) * 86400000) + ((args.hours ? args.hours : 0) * 3600000) + ((args.minutes ? args.minutes : 0) * 60000) + ((args.seconds ? args.seconds : 0) * 1000)
+	// get total milliseconds
+	var ms = ((args.days ? args.days : 0) * 86400000) + ((args.hours ? args.hours : 0) * 3600000) + ((args.minutes ? args.minutes : 0) * 60000) + ((args.seconds ? args.seconds : 0) * 1000)
 
-	await message.channel.send(`Set timer for ${args.days ? `${args.days} days, ` : ''}${args.hours ? `${args.hours} hours, ` : ''}${args.minutes ? `${args.minutes} minutes, ` : ''}${args.seconds ? `${args.seconds} seconds ` : ''}from now${args.reason ? ` for \`${args.reason}\`` : ''}.`)
+	// if ms > 32bit integer max size
+	if (ms > 2147483646) {
+		return message.channel.send('Reminder is too far into the future. Try a shorter time!')
+	}
 
-	setTimeout(() => {
-		return message.channel.send(`<@${message.member.id}>, Reminding you${args.reason ? ` for \`${args.reason}\`` : ''}!`)
-	}, time)
+	// get future date
+	var time = +new Date() + ms
+
+	await message.channel.send(`Set a reminder for ${new Date(time).toISOString().replace(/T/, ' ').replace(/\..+/, '')} ${args.reason ? ` for \`${args.reason}\`` : ''}.`)
+
+	// send the reminder to the database
+	var reminder = new Reminder({ uniqueId: Math.random() * (999999999 - 0), userId: message.author.id, remainingTime: time, reminderReason: args.reason })
+	await reminder.save()
+
+	// create a timer for the reminder
+	setTimeout(async () => {
+		await reminder.delete()
+		await message.author.send(`Reminding you${args.reason ? ` for \`${args.reason}\`` : ''}!`)
+	}, time - +Date.now())
 }
 
 exports.yargsOpts = {
