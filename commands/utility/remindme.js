@@ -14,7 +14,7 @@ exports.run = async (handler, message, args, pre) => {
 
 exports.yargsOpts = {
 	alias: {
-        days: ['d'],
+		days: ['d'],
 		hours: ['h'],
 		minutes: ['m'],
 		seconds: ['s'],
