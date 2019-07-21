@@ -1,9 +1,8 @@
 const mongoose = require('mongoose')
 
 const schema = mongoose.Schema({
-	uniqueId: String,
 	userId: String,
-	remainingTime: String,
+	reminderDate: String,
 	reminderReason: String
 })
 

@@ -122,7 +122,7 @@ class Handler {
 				await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
 				await reminder.delete()
 				// If the reminder time < 0, remind the user immediately
-			}, reminder.remainingTime - +Date.now() <= 0 ? 1 : reminder.remainingTime - +Date.now())
+			}, reminder.reminderDate - Date.now() <= 0 ? 1 : reminder.reminderDate - Date.now())
 		}
 	}
 

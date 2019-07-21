@@ -14,19 +14,19 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	// get future date
-	var time = +new Date() + ms
+	var reminderDate = Date.now() + ms
 
-	await message.channel.send(`Set a reminder for ${new Date(time).toISOString().replace(/T/, ' ').replace(/\..+/, '')} ${args.reason ? ` for \`${args.reason}\`` : ''}.`)
+	await message.channel.send(`Set a reminder for ${new Date(reminderDate).toISOString().replace(/T/, ' ').replace(/\..+/, '')} ${args.reason ? ` for \`${args.reason}\`` : ''}.`)
 
 	// send the reminder to the database
-	var reminder = new Reminder({ uniqueId: Math.random() * (999999999 - 0), userId: message.author.id, remainingTime: time, reminderReason: args.reason })
+	var reminder = new Reminder({ userId: message.author.id, reminderDate: reminderDate, reminderReason: args.reason })
 	await reminder.save()
 
 	// create a timer for the reminder
 	setTimeout(async () => {
 		await reminder.delete()
 		await message.author.send(`Reminding you${args.reason ? ` for \`${args.reason}\`` : ''}!`)
-	}, time - +Date.now())
+	}, reminderDate - Date.now())
 }
 
 exports.yargsOpts = {
