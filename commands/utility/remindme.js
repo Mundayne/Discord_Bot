@@ -1,4 +1,5 @@
-const Reminder = require('../../src/models/Reminders.js')
+const logger = require('winston').loggers.get('default')
+const Reminder = require('../../src/models/Reminder.js')
 
 exports.run = async (handler, message, args, pre) => {
 	if (!args.days && !args.hours && !args.minutes && !args.seconds) {
@@ -24,8 +25,16 @@ exports.run = async (handler, message, args, pre) => {
 
 	// create a timer for the reminder
 	setTimeout(async () => {
-		await reminder.delete()
-		await message.author.send(`Reminding you${args.reason ? ` for \`${args.reason}\`` : ''}!`)
+		try {
+			await reminder.delete()
+		} catch (err) {
+			logger.error(`Could not delete reminder from database.`)
+		}
+		try {
+			await message.author.send(`Reminding you${args.reason ? ` for \`${args.reason}\`` : ''}!`)
+		} catch (err) {
+			logger.error(`Could not send user ${message.author.tag} a reminder.`)
+		}
 	}, reminderDate - Date.now())
 }
 

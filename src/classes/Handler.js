@@ -6,7 +6,7 @@ const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixAr
 const Help = require('./Help')
 const MemberRoles = require('../models/MemberRoles')
 const CONFIG = require('../../config')
-const Reminder = require('../../src/models/Reminders.js')
+const Reminder = require('../models/Reminder.js')
 
 class Handler {
 	constructor (client) {
@@ -119,8 +119,21 @@ class Handler {
 			setTimeout(async () => {
 				let user = await this.client.fetchUser(reminder.userId)
 
-				await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
-				await reminder.delete()
+				if (!user) {
+					return logger.error(`Could not fetch user ${reminder.userId}.`)
+				}
+
+				try {
+					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
+				} catch (err) {
+					logger.error(`Something went wrong with trying to remind ${user.tag} or removing the message from the database.`)
+				}
+
+				try {
+					await reminder.delete()
+				} catch (err) {
+					logger.error(`Could not delete reminder from database.`)
+				}
 				// If the reminder time < 0, remind the user immediately
 			}, reminder.reminderDate - Date.now() <= 0 ? 1 : reminder.reminderDate - Date.now())
 		}

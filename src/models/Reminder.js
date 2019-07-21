@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const schema = mongoose.Schema({
 	userId: String,
-	reminderDate: String,
+	reminderDate: Date,
 	reminderReason: String
 })
 
-module.exports = mongoose.model('Reminders', schema, 'reminders')
+module.exports = mongoose.model('Reminder', schema, 'reminders')
