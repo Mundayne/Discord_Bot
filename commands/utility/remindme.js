@@ -25,16 +25,13 @@ exports.run = async (handler, message, args, pre) => {
 
 	// create a timer for the reminder
 	setTimeout(async () => {
-		try {
-			await reminder.delete()
-		} catch (err) {
-			logger.error(`Could not delete reminder from database.`)
-		}
-		try {
-			await message.author.send(`Reminding you${args.reason ? ` for \`${args.reason}\`` : ''}!`)
-		} catch (err) {
-			logger.error(`Could not send user ${message.author.tag} a reminder.`)
-		}
+			try {
+				await message.author.send(`Reminding you${reminder.reminderReason || ''}!`)
+				await reminder.delete()
+			} catch (err)  {
+				logger.error(`Something happened with a reminder:\n${err}`)
+			}
+
 	}, reminderDate - Date.now())
 }
 

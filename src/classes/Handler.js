@@ -117,25 +117,15 @@ class Handler {
 		for (let reminder of reminders) {
 			// create a timer for all existing reminders in the database
 			setTimeout(async () => {
-				let user = await this.client.fetchUser(reminder.userId)
-
-				if (!user) {
-					return logger.error(`Could not fetch user ${reminder.userId}.`)
-				}
-
-				try {
-					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
-				} catch (err) {
-					logger.error(`Something went wrong with trying to remind ${user.tag} or removing the message from the database.`)
-				}
-
-				try {
-					await reminder.delete()
-				} catch (err) {
-					logger.error(`Could not delete reminder from database.`)
-				}
+			try {
+				var user = await this.client.fetchUser(reminder.userId)
+				msg = await user.send(`Reminding you${reminder.reminderReason || ''}!`)
+				await reminder.delete()
+			} catch (err)  {
+				logger.error(`Something happened with a reminder:\n${err}`)
+			}
 				// If the reminder time < 0, remind the user immediately
-			}, reminder.reminderDate - Date.now() <= 0 ? 1 : reminder.reminderDate - Date.now())
+			}, reminder.reminderDate - Date.now() <= 0 || 1)
 		}
 	}
 
