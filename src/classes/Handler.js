@@ -119,10 +119,11 @@ class Handler {
 			setTimeout(async () => {
 				try {
 					var user = await this.client.fetchUser(reminder.userId)
-					await user.send(`Reminding you${reminder.reminderReason || ''}!`)
+					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
 					await reminder.delete()
 				} catch (err) {
-					logger.error(`Something happened with a reminder:\n${err}`)
+					logger.error(`Something happened with a reminder.`)
+					logger.error(err)
 				}
 				// If the reminder time < 0, remind the user immediately
 			}, reminder.reminderDate - Date.now() <= 0 || 1)

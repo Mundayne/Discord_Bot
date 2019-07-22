@@ -17,7 +17,7 @@ exports.run = async (handler, message, args, pre) => {
 	// get future date
 	var reminderDate = Date.now() + ms
 
-	await message.channel.send(`Set a reminder for ${new Date(reminderDate).toISOString().replace(/T/, ' ').replace(/\..+/, '')} ${args.reason ? ` for \`${args.reason}\`` : ''}.`)
+	await message.channel.send(`Set a reminder for ${new Date(reminderDate).toISOString().replace(/T/, ' ').replace(/\..+/, '')}${args.reason ? ` for \`${args.reason}\`` : ''}.`)
 
 	// send the reminder to the database
 	var reminder = new Reminder({ userId: message.author.id, reminderDate: reminderDate, reminderReason: args.reason })
@@ -26,10 +26,11 @@ exports.run = async (handler, message, args, pre) => {
 	// create a timer for the reminder
 	setTimeout(async () => {
 		try {
-			await message.author.send(`Reminding you${reminder.reminderReason || ''}!`)
+			await message.author.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
 			await reminder.delete()
 		} catch (err) {
-			logger.error(`Something happened with a reminder:\n${err}`)
+			logger.error(`Something happened with a reminder.`)
+			logger.error(err)
 		}
 	}, reminderDate - Date.now())
 }
