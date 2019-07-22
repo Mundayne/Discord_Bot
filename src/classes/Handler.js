@@ -117,13 +117,13 @@ class Handler {
 		for (let reminder of reminders) {
 			// create a timer for all existing reminders in the database
 			setTimeout(async () => {
-			try {
-				var user = await this.client.fetchUser(reminder.userId)
-				msg = await user.send(`Reminding you${reminder.reminderReason || ''}!`)
-				await reminder.delete()
-			} catch (err)  {
-				logger.error(`Something happened with a reminder:\n${err}`)
-			}
+				try {
+					var user = await this.client.fetchUser(reminder.userId)
+					await user.send(`Reminding you${reminder.reminderReason || ''}!`)
+					await reminder.delete()
+				} catch (err) {
+					logger.error(`Something happened with a reminder:\n${err}`)
+				}
 				// If the reminder time < 0, remind the user immediately
 			}, reminder.reminderDate - Date.now() <= 0 || 1)
 		}
