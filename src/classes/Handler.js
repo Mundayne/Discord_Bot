@@ -7,6 +7,7 @@ const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixAr
 const Help = require('./Help')
 const MemberRoles = require('../models/MemberRoles')
 const CONFIG = require('../../config')
+const Reminder = require('../models/Reminder.js')
 
 class Handler {
 	constructor (client) {
@@ -112,6 +113,23 @@ class Handler {
 		}
 		await Promise.all(saveOps)
 		logger.info('Finished updating member roles database.')
+
+		// get all ongoing reminders
+		let reminders = await Reminder.find({})
+		for (let reminder of reminders) {
+			// create a timer for all existing reminders in the database
+			setTimeout(async () => {
+				try {
+					var user = await this.client.fetchUser(reminder.userId)
+					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
+					await reminder.delete()
+				} catch (err) {
+					logger.error(`Something happened with a reminder.`)
+					logger.error(err)
+				}
+				// If the reminder time < 0, remind the user immediately
+			}, reminder.reminderDate - Date.now() <= 0 || 1)
+		}
 	}
 
 	async message (message) {
