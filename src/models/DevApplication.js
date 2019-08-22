@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const schema = mongoose.Schema({
 	userId: String,
+	guildId: String,
 	githubUrl: String,
 	helper: Boolean,
 	messageId: String

@@ -11,6 +11,7 @@ exports.run = async (handler, message, args, pre) => {
 		let applicationMessage = new discord.RichEmbed()
 			.setAuthor(message.member.displayName, message.author.displayAvatarURL)
 			.setTitle('Developer Role Application')
+			.addField('User ID:', message.member.id)
 			.addField('GitHub URL:', args.github)
 			.addField('Wants to be Helper:', args.helper ? 'yes' : 'no')
 			.setColor(0xffffff)
@@ -18,13 +19,13 @@ exports.run = async (handler, message, args, pre) => {
 		let messageId
 		await modLog.send({ embed: applicationMessage }).then(function (m) { messageId = m.id })
 
-		let devApplication = new DevApplication({ userId: message.author.id, githubUrl: args.github, helper: args.helper, messageId: messageId })
+		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.github, helper: args.helper, messageId: messageId })
 		await devApplication.save()
 
 		responseMessage = 'Thank you for your application! Please be patient as The Council processes your request.'
 	}
 
-	message.author.send(responseMessage)
+	await message.author.send(responseMessage)
 }
 
 exports.yargsOpts = {
