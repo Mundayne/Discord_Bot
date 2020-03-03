@@ -117,6 +117,7 @@ class Handler {
 		// get all ongoing reminders
 		let reminders = await Reminder.find({})
 		for (let reminder of reminders) {
+			let reminderTimeout = reminder.reminderDate - Date.now()
 			// create a timer for all existing reminders in the database
 			setTimeout(async () => {
 				try {
@@ -127,8 +128,8 @@ class Handler {
 					logger.error(`Something happened with a reminder.`)
 					logger.error(err)
 				}
-				// If the reminder time < 0, remind the user immediately
-			}, reminder.reminderDate - Date.now() <= 0 || 1)
+				// If the reminder time <= 0, remind the user immediately
+			}, reminderTimeout > 0 ? reminderTimeout : 1)
 		}
 	}
 
