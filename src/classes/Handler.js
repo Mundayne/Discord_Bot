@@ -176,7 +176,6 @@ class Handler {
 	}
 
 	async messageDelete (message) {
-		let eventTime = new Date()
 		try {
 			let logChannel = message.guild.channels.find(e => e.name === 'message-deletions')
 			if (!logChannel) throw new Error(`No logging channel for message deletions found in guild "${message.guild.name}"`)
@@ -185,8 +184,10 @@ class Handler {
 				.setColor(message.member.displayColor || null)
 				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL)
 				.setDescription(message.content)
-				.addField('Channel', `${message.channel} (#${message.channel.name})`)
-				.setTimestamp(eventTime)
+				.addField('Channel', `${message.channel} (#${message.channel.name})`, true)
+				.addField('Author', `${message.author}`, true)
+				.setFooter(`Message ID: ${message.id}`)
+				.setTimestamp(message.createdTimestamp)
 			await logChannel.send({ embed })
 		} catch (err) {
 			logger.error('Error while logging message deletion:')
