@@ -3,7 +3,7 @@ const discord = require('discord.js')
 
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
-	let existingApplication = await DevApplication.findOne({ userId: message.author.id }).exec()
+	let existingApplication = await DevApplication.findOne({ userId: message.author.id, guildId: message.guild.id }).exec()
 	if (existingApplication) {
 		responseMessage = 'You\'ve already requested the developer role; please be patient as The Council processes your request.'
 	} else {
