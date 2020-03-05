@@ -1,3 +1,4 @@
+const Discord = require('discord.js')
 const mongoose = require('mongoose')
 const logger = require('winston').loggers.get('default')
 const fs = require('fs')
@@ -6,6 +7,7 @@ const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixAr
 const Help = require('./Help')
 const MemberRoles = require('../models/MemberRoles')
 const CONFIG = require('../../config')
+const Reminder = require('../models/Reminder.js')
 
 class Handler {
 	constructor (client) {
@@ -16,6 +18,7 @@ class Handler {
 
 		client.on('ready', () => this.ready())
 		client.on('message', message => this.message(message))
+		client.on('messageDelete', message => this.messageDelete(message))
 		client.on('guildMemberAdd', member => this.guildMemberAdd(member))
 		client.on('guildMemberUpdate', (oldMember, newMember) => this.guildMemberUpdate(oldMember, newMember))
 
@@ -110,6 +113,24 @@ class Handler {
 		}
 		await Promise.all(saveOps)
 		logger.info('Finished updating member roles database.')
+
+		// get all ongoing reminders
+		let reminders = await Reminder.find({})
+		for (let reminder of reminders) {
+			let reminderTimeout = reminder.reminderDate - Date.now()
+			// create a timer for all existing reminders in the database
+			setTimeout(async () => {
+				try {
+					var user = await this.client.fetchUser(reminder.userId)
+					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
+					await reminder.delete()
+				} catch (err) {
+					logger.error(`Something happened with a reminder.`)
+					logger.error(err)
+				}
+				// If the reminder time <= 0, remind the user immediately
+			}, reminderTimeout > 0 ? reminderTimeout : 1)
+		}
 	}
 
 	async message (message) {
@@ -152,6 +173,26 @@ class Handler {
 				logger.error(`Error during command "${name}":`)
 				logger.error(e)
 			}
+		}
+	}
+
+	async messageDelete (message) {
+		try {
+			let logChannel = message.guild.channels.find(e => e.name === 'message-deletions')
+			if (!logChannel) throw new Error(`No logging channel for message deletions found in guild "${message.guild.name}"`)
+			if (message.channel.id === logChannel.id) return
+			let embed = new Discord.RichEmbed()
+				.setColor(message.member.displayColor || null)
+				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL)
+				.setDescription(message.content)
+				.addField('Channel', `${message.channel} (#${message.channel.name})`, true)
+				.addField('Author', `${message.author}`, true)
+				.setFooter(`Message ID: ${message.id}`)
+				.setTimestamp(message.createdTimestamp)
+			await logChannel.send({ embed })
+		} catch (err) {
+			logger.error('Error while logging message deletion:')
+			logger.error(err)
 		}
 	}
 

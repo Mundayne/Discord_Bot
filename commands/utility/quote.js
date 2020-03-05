@@ -59,6 +59,7 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	let quoteText = quoteMessage.content
+	let quotePermalink = `\n\n[Permalink](${quoteMessage.url})`
 	let embed = new Discord.RichEmbed()
 		.setColor(message.guild.member(quoteMessage.author).displayColor || null)
 		.setAuthor(quoteMessage.author.username, quoteMessage.author.avatarURL)
@@ -72,12 +73,12 @@ exports.run = async (handler, message, args, pre) => {
 		}
 	}
 
-	if (quoteText.length > DESCRIPTION_LIMIT) {
-		quoteText = quoteText.slice(0, DESCRIPTION_LIMIT - 1) + '…'
+	if (quoteText.length > DESCRIPTION_LIMIT - quotePermalink.length) {
+		quoteText = quoteText.slice(0, DESCRIPTION_LIMIT - quotePermalink.length - 1) + '…'
 	}
-	embed.setDescription(quoteText)
+	embed.setDescription(quoteText + quotePermalink)
 
-	return message.channel.send(quoteMessage.url, { embed })
+	return message.channel.send({ embed })
 }
 
 exports.yargsOpts = {
