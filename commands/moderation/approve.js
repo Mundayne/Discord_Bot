@@ -3,7 +3,7 @@ const { DevApplication } = require('../../src/models')
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
 	let member = message.guild.members.get(args.user)
-	let devApplication = await DevApplication.where().findOne({ userId: args.user }).exec()
+	let devApplication = await DevApplication.where().findOne({ userId: args.user, guildId: message.guild.id }).exec()
 
 	if (devApplication) {
 		let log = message.guild.channels.find(c => c.name === 'mod-log')
@@ -26,7 +26,7 @@ exports.run = async (handler, message, args, pre) => {
 			let developerRole = message.guild.roles.find(r => r.name.toLowerCase() === 'developer')
 			let helperRole = message.guild.roles.find(r => r.name.toLowerCase() === 'helper')
 			await member.addRole(developerRole)
-			if (devApplication.helper) member.addRole(helperRole)
+			if (devApplication.helper) await member.addRole(helperRole)
 			await member.send(`Your application for the Developer and/or Helper roles has been approved!\n${args.message}`)
 			responseMessage = 'Application approved, member informed.'
 			embed.color = 0x00ff00
@@ -36,7 +36,7 @@ exports.run = async (handler, message, args, pre) => {
 			embed.color = 0xff0000
 		}
 		await msg.edit({ embed: embed })
-		await DevApplication.where().findOneAndDelete({ userId: args.user }).exec()
+		await devApplication.deleteOne().exec()
 	} else {
 		responseMessage = 'That user has not applied for the developer role.'
 	}
