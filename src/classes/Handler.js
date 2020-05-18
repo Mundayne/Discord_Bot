@@ -7,7 +7,8 @@ const { ArgumentError, InsufficientPermissionsError, PreCheckFailedError, UnixAr
 const Help = require('./Help')
 const MemberRoles = require('../models/MemberRoles')
 const CONFIG = require('../../config')
-const Reminder = require('../models/Reminder.js')
+const ReminderManager = require('./ReminderManager.js')
+const { LOAD_INTERVAL } = require('../../src/constants/reminders.js')
 
 class Handler {
 	constructor (client) {
@@ -15,6 +16,7 @@ class Handler {
 		this.prefix = CONFIG.prefix
 		this.client = client
 		this.help = new Help(this)
+		this.reminderManager = new ReminderManager(this)
 
 		client.on('ready', () => this.ready())
 		client.on('message', message => this.message(message))
@@ -114,23 +116,8 @@ class Handler {
 		await Promise.all(saveOps)
 		logger.info('Finished updating member roles database.')
 
-		// get all ongoing reminders
-		let reminders = await Reminder.find({})
-		for (let reminder of reminders) {
-			let reminderTimeout = reminder.reminderDate - Date.now()
-			// create a timer for all existing reminders in the database
-			setTimeout(async () => {
-				try {
-					var user = await this.client.fetchUser(reminder.userId)
-					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
-					await reminder.delete()
-				} catch (err) {
-					logger.error(`Something happened with a reminder.`)
-					logger.error(err)
-				}
-				// If the reminder time <= 0, remind the user immediately
-			}, reminderTimeout > 0 ? reminderTimeout : 1)
-		}
+		this.reminderManager.loadReminders()
+		this.client.setInterval(() => this.reminderManager.loadReminders(), LOAD_INTERVAL)
 	}
 
 	async message (message) {

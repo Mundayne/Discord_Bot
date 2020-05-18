@@ -1,4 +1,3 @@
-const logger = require('winston').loggers.get('default')
 const Reminder = require('../../src/models/Reminder.js')
 
 exports.run = async (handler, message, args, pre) => {
@@ -9,11 +8,6 @@ exports.run = async (handler, message, args, pre) => {
 	// get total milliseconds
 	var ms = ((args.days ? args.days : 0) * 86400000) + ((args.hours ? args.hours : 0) * 3600000) + ((args.minutes ? args.minutes : 0) * 60000) + ((args.seconds ? args.seconds : 0) * 1000)
 
-	// if ms > 32bit integer max size
-	if (ms > 2147483646) {
-		return message.channel.send('Reminder is too far into the future. Try a shorter time!')
-	}
-
 	// get future date
 	var reminderDate = Date.now() + ms
 
@@ -23,16 +17,8 @@ exports.run = async (handler, message, args, pre) => {
 	var reminder = new Reminder({ userId: message.author.id, reminderDate: reminderDate, reminderReason: args.reason })
 	await reminder.save()
 
-	// create a timer for the reminder
-	setTimeout(async () => {
-		try {
-			await message.author.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
-			await reminder.delete()
-		} catch (err) {
-			logger.error(`Something happened with a reminder.`)
-			logger.error(err)
-		}
-	}, reminderDate - Date.now())
+	// ensure new reminder is loaded if it's due soon
+	handler.reminderManager.loadReminders()
 }
 
 exports.yargsOpts = {
