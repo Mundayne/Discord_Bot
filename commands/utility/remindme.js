@@ -6,15 +6,15 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	// get total milliseconds
-	var ms = ((args.days ? args.days : 0) * 86400000) + ((args.hours ? args.hours : 0) * 3600000) + ((args.minutes ? args.minutes : 0) * 60000) + ((args.seconds ? args.seconds : 0) * 1000)
+	let ms = ((args.days ? args.days : 0) * 86400000) + ((args.hours ? args.hours : 0) * 3600000) + ((args.minutes ? args.minutes : 0) * 60000) + ((args.seconds ? args.seconds : 0) * 1000)
 
 	// get future date
-	var reminderDate = Date.now() + ms
+	let reminderDate = Date.now() + ms
 
 	await message.channel.send(`Set a reminder for ${new Date(reminderDate).toISOString().replace(/T/, ' ').replace(/\..+/, '')}${args.reason ? ` for \`${args.reason}\`` : ''}.`)
 
 	// send the reminder to the database
-	var reminder = new Reminder({ userId: message.author.id, reminderDate: reminderDate, reminderReason: args.reason })
+	let reminder = new Reminder({ userId: message.author.id, reminderDate: reminderDate, reminderReason: args.reason })
 	await reminder.save()
 
 	// ensure new reminder is loaded if it's due soon
