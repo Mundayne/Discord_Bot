@@ -1,5 +1,7 @@
 const Discord = require('discord.js')
 
+const formatDate = require('../../src/utility/formatDate.js')
+
 exports.run = async (handler, message, args, pre) => {
 	let member = message.member
 
@@ -26,8 +28,8 @@ exports.run = async (handler, message, args, pre) => {
 		embed.addField('Nickname', member.nickname, true)
 	}
 
-	embed.addField('Date Joined', `${member.joinedAt.toISOString().slice(0, -5)}Z`, true)
-		.addField('User Creation Date', `${member.user.createdAt.toISOString().slice(0, -5)}Z`, true)
+	embed.addField('Date Joined', `${formatDate(member.joinedAt)}`, true)
+		.addField('User Creation Date', `${formatDate(member.user.createdAt)}`, true)
 
 	return message.channel.send({ embed })
 }
