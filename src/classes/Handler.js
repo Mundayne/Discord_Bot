@@ -75,7 +75,7 @@ class Handler {
 
 	async start () {
 		try {
-			await mongoose.connect(CONFIG.database, { useNewUrlParser: true, useUnifiedTopology: true })
+			await mongoose.connect(CONFIG.database, { useNewUrlParser: true })
 			await this.client.login(CONFIG.token)
 			process.title = CONFIG.procName
 		} catch (err) {

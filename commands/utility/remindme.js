@@ -1,4 +1,3 @@
-const formatDate = require('../../src/utility/formatDate.js')
 const Reminder = require('../../src/models/Reminder.js')
 
 exports.run = async (handler, message, args, pre) => {
@@ -12,7 +11,7 @@ exports.run = async (handler, message, args, pre) => {
 	// get future date
 	let reminderDate = Date.now() + ms
 
-	await message.channel.send(`Set a reminder for ${formatDate(new Date(reminderDate))}${args.reason ? ` for \`${args.reason}\`` : ''}.`)
+	await message.channel.send(`Set a reminder for ${new Date(reminderDate).toISOString().replace(/T/, ' ').replace(/\..+/, '')}${args.reason ? ` for \`${args.reason}\`` : ''}.`)
 
 	// send the reminder to the database
 	let reminder = new Reminder({ userId: message.author.id, reminderDate: reminderDate, reminderReason: args.reason })
