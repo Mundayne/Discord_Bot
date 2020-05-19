@@ -1,10 +1,4 @@
-const UnixHelpError = require('../../src/errors/UnixHelpError.js')
-
 exports.run = async (handler, message, args, pre) => {
-	if (!(args.add || args.remove || args.list)) {
-		throw new UnixHelpError()
-	}
-
 	// Member that sends message
 	let member = await message.guild.fetchMember(message.author)
 
@@ -30,30 +24,25 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	// Send a message explaining the actions done
-	let text = `${message.author},`
 	if (!isDeveloper) {
-		text += ' you are not a developer. Please apply to be a developer before adding the helper role!'
+		message.reply(' you are not a developer. Please apply to be a developer before adding the helper role!')
 	} else if (hadRole) {
-		text += ` added the Helper role!`
+		message.reply(' added the helper role!')
 	} else if (!hadRole) {
-		text += ' removed the Helper role!'
+		message.reply(' removed the helper role!')
 	}
-	return message.channel.send(text)
 }
 
 // Export to help
 exports.yargsOpts = {
 	alias: {
-		add: ['a'],
-		help: ['h'],
-		remove: ['r']
-	},
-	array: ['add', 'remove']
+		help: ['h']
+	}
 }
 
 // How it appears in help
 exports.help = {
 	name: ['helper'],
 	group: 'utility',
-	description: 'Add or remove the helper role if you are a developer.'
+	description: 'Toggles the helper role if you are a developer.'
 }
