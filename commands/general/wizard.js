@@ -13,13 +13,12 @@ exports.run = async (handler, message, args, pre) => {
 			.setTitle('Developer Role Application')
 			.addField('User ID:', message.member.id)
 			.addField('GitHub URL:', args.github)
-			.addField('Wants to be Helper:', args.helper ? 'yes' : 'no')
 			.setColor(0xffffff)
 
 		let messageId
 		await modLog.send({ embed: applicationMessage }).then(function (m) { messageId = m.id })
 
-		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.github, helper: args.helper, messageId: messageId })
+		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.github, messageId: messageId })
 		await devApplication.save()
 
 		responseMessage = 'Thank you for your application! Please be patient as The Council processes your request.'
@@ -34,10 +33,6 @@ exports.yargsOpts = {
 		help: ['h']
 	},
 	string: ['github'],
-	boolean: ['helper'],
-	default: {
-		helper: false
-	},
 	required: ['github']
 }
 
