@@ -61,7 +61,7 @@ exports.run = async (handler, message, args, pre) => {
 	let quoteText = quoteMessage.content
 	let quotePermalink = `\n\n[Permalink](${quoteMessage.url})`
 	let embed = new Discord.RichEmbed()
-		.setColor(message.guild.member(quoteMessage.author).displayColor || null)
+		.setColor((message.guild.member(quoteMessage.author) && message.guild.member(quoteMessage.author).displayColor) || null)
 		.setAuthor(quoteMessage.author.username, quoteMessage.author.avatarURL)
 		.setTimestamp(quoteMessage.createdTimestamp)
 
