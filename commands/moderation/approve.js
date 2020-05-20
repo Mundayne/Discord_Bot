@@ -24,14 +24,12 @@ exports.run = async (handler, message, args, pre) => {
 
 		if (args.approved) {
 			let developerRole = message.guild.roles.find(r => r.name.toLowerCase() === 'developer')
-			let helperRole = message.guild.roles.find(r => r.name.toLowerCase() === 'helper')
 			await member.addRole(developerRole)
-			if (devApplication.helper) await member.addRole(helperRole)
-			await member.send(`Your application for the Developer and/or Helper roles has been approved!\n${args.message}`)
+			await member.send(`Your application for the Developer role has been approved!\n${args.message}`)
 			responseMessage = 'Application approved, member informed.'
 			embed.color = 0x00ff00
 		} else {
-			await member.send(`Your application for the Developer and/or Helper roles has been denied.\n${args.message}`)
+			await member.send(`Your application for the Developer role has been denied.\n${args.message}`)
 			responseMessage = 'Application denied, member informed.'
 			embed.color = 0xff0000
 		}
