@@ -16,20 +16,20 @@ exports.run = async (handler, message, args, pre) => {
 			let match = regex.exec(args.link)
 			let channelId = match[1]
 			let messageId = match[2]
-			channel = message.client.channels.get(channelId)
-			quoteMessage = await channel.fetchMessage(messageId)
+			channel = message.client.channels.cache.get(channelId)
+			quoteMessage = await channel.messages.fetch(messageId)
 		} catch (err) {
 			return message.reply('invalid message link.')
 		}
 	} else {
-		channel = args.channel ? message.client.channels.get(args.channel) : message.channel
+		channel = args.channel ? message.client.channels.cache.get(args.channel) : message.channel
 		if (!channel || channel.type !== 'text') {
 			return message.reply('"channel" must be a valid text channel.')
 		}
 		if (args.id) {
 			// get message by ID
 			try {
-				quoteMessage = await channel.fetchMessage(args.id)
+				quoteMessage = await channel.messages.fetch(args.id)
 			} catch (err) {
 				if (err.message.includes('snowflake')) {
 					return message.reply('invalid message ID.')
@@ -40,12 +40,12 @@ exports.run = async (handler, message, args, pre) => {
 			// get message by starting text
 			let user
 			if (args.user !== undefined) {
-				user = message.client.users.get(args.user)
+				user = message.client.users.cache.get(args.user)
 				if (!user) {
 					return message.reply('invalid user.')
 				}
 			}
-			let lastMessages = (await channel.fetchMessages({ limit: 100 })).array()
+			let lastMessages = (await channel.messages.fetch({ limit: 100 })).array()
 			for (let msg of lastMessages) {
 				if (msg.content.toLowerCase().startsWith(args.text.toLowerCase()) && (!user || msg.author.id === user.id)) {
 					quoteMessage = msg
@@ -60,13 +60,13 @@ exports.run = async (handler, message, args, pre) => {
 
 	let quoteText = quoteMessage.content
 	let quotePermalink = `\n\n[Permalink](${quoteMessage.url})`
-	let embed = new Discord.RichEmbed()
+	let embed = new Discord.MessageEmbed()
 		.setColor((message.guild.member(quoteMessage.author) && message.guild.member(quoteMessage.author).displayColor) || null)
-		.setAuthor(quoteMessage.author.username, quoteMessage.author.avatarURL)
+		.setAuthor(quoteMessage.author.username, quoteMessage.author.avatarURL())
 		.setTimestamp(quoteMessage.createdTimestamp)
 
 	if (args.next) {
-		let nextMessages = (await channel.fetchMessages({ after: quoteMessage.id, limit: 100 })).array()
+		let nextMessages = (await channel.messages.fetch({ after: quoteMessage.id, limit: 100 })).array()
 		nextMessages = nextMessages.filter(e => e.author.id === quoteMessage.author.id).reverse()
 		for (let i = 0; i < args.next && i < nextMessages.length; ++i) {
 			quoteText += '\n' + nextMessages[i].content

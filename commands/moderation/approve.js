@@ -2,12 +2,12 @@ const { DevApplication } = require('../../src/models')
 
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
-	let member = message.guild.members.get(args.user)
+	let member = message.guild.member(args.user)
 	let devApplication = await DevApplication.where().findOne({ userId: args.user, guildId: message.guild.id }).exec()
 
 	if (devApplication) {
-		let log = message.guild.channels.find(c => c.name === 'mod-log')
-		let msg = await log.fetchMessage(devApplication.messageId)
+		let log = message.guild.channels.cache.find(c => c.name === 'mod-log')
+		let msg = await log.messages.fetch(devApplication.messageId)
 		let msgEmbed = msg.embeds[0]
 		// remove circular json
 		delete msgEmbed.author.embed
@@ -23,8 +23,8 @@ exports.run = async (handler, message, args, pre) => {
 		}
 
 		if (args.approved) {
-			let developerRole = message.guild.roles.find(r => r.name.toLowerCase() === 'developer')
-			await member.addRole(developerRole)
+			let developerRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'developer')
+			await member.roles.add(developerRole)
 			await member.send(`Your application for the Developer role has been approved!\n${args.message}`)
 			responseMessage = 'Application approved, member informed.'
 			embed.color = 0x00ff00

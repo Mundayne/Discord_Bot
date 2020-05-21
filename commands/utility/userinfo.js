@@ -9,8 +9,8 @@ exports.run = async (handler, message, args, pre) => {
 		let user
 
 		try {
-			user = await message.client.fetchUser(args.user)
-			member = await message.guild.fetchMember(user)
+			user = await message.client.users.fetch(args.user)
+			member = await message.guild.members.fetch(user)
 		} catch (exception) {
 			if (user) {
 				return message.channel.send('User is not in server.')
@@ -20,9 +20,9 @@ exports.run = async (handler, message, args, pre) => {
 		}
 	}
 
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 		.setColor(member.displayColor || null)
-		.setAuthor(`${member.user.tag}`, member.user.avatarURL)
+		.setAuthor(`${member.user.tag}`, member.user.avatarURL())
 
 	if (member.nickname) {
 		embed.addField('Nickname', member.nickname, true)

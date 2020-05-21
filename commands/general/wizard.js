@@ -7,9 +7,9 @@ exports.run = async (handler, message, args, pre) => {
 	if (existingApplication) {
 		responseMessage = 'You\'ve already requested the developer role; please be patient as The Council processes your request.'
 	} else {
-		let modLog = message.guild.channels.find(c => c.name === 'mod-log')
-		let applicationMessage = new discord.RichEmbed()
-			.setAuthor(message.member.displayName, message.author.displayAvatarURL)
+		let modLog = message.guild.channels.cache.find(c => c.name === 'mod-log')
+		let applicationMessage = new discord.MessageEmbed()
+			.setAuthor(message.member.displayName, message.author.displayAvatarURL())
 			.setTitle('Developer Role Application')
 			.addField('User ID:', message.member.id)
 			.addField('GitHub URL:', args.github)
