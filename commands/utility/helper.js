@@ -1,5 +1,5 @@
 exports.run = async (handler, message, args, pre) => {
-	let member = await message.guild.members.fetch(message.author)
+	let member = message.member || await message.guild.members.fetch(message.author)
 
 	let helperRole = await message.guild.roles.cache.find(role => role.name === 'Helper')
 	let developerRole = await message.guild.roles.cache.find(role => role.name === 'Developer')

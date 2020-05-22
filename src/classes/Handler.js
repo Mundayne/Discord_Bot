@@ -168,8 +168,16 @@ class Handler {
 			let logChannel = message.guild.channels.cache.find(e => e.name === 'message-deletions')
 			if (!logChannel) throw new Error(`No logging channel for message deletions found in guild "${message.guild.name}"`)
 			if (message.channel.id === logChannel.id) return
+			let member
+			try {
+				member = message.member || await message.guild.members.fetch(message.author)
+			} catch (err) {
+				if (!err.message === 'Unknown Member') {
+					throw err
+				}
+			}
 			let embed = new Discord.MessageEmbed()
-				.setColor(message.member.displayColor || null)
+				.setColor((member && member.displayColor) || null)
 				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL())
 				.setDescription(message.content)
 				.addField('Channel', `${message.channel} (#${message.channel.name})`, true)

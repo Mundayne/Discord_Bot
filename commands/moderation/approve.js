@@ -2,7 +2,6 @@ const { DevApplication } = require('../../src/models')
 
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
-	let member = message.guild.member(args.user)
 	let devApplication = await DevApplication.where().findOne({ userId: args.user, guildId: message.guild.id }).exec()
 
 	if (devApplication) {
@@ -20,6 +19,19 @@ exports.run = async (handler, message, args, pre) => {
 				return field
 			}),
 			color: msgEmbed.color
+		}
+
+		let member
+		try {
+			member = message.guild.member(args.user) || await message.guild.members.fetch(args.user)
+		} catch (err) {
+			if (err.message === 'Unknown Member') {
+				embed.color = 0x000000
+				await msg.edit({ embed: embed })
+				await devApplication.remove()
+				return message.reply('That user is no longer in the server.')
+			}
+			throw err
 		}
 
 		if (args.approved) {
