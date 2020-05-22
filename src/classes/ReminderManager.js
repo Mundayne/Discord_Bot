@@ -28,8 +28,7 @@ class ReminderManager {
 					logger.error(`Something happened with a reminder.`)
 					logger.error(err)
 				}
-				// If the reminder time <= 0, remind the user immediately
-			}, reminderTimeout > 0 ? reminderTimeout : 1)
+			}, reminderTimeout > 0 ? reminderTimeout : 1) // If the reminder time <= 0, remind the user immediately
 		}
 	}
 }

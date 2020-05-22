@@ -1,5 +1,6 @@
+const Discord = require('discord.js')
 const { DevApplication } = require('../../src/models')
-const discord = require('discord.js')
+const { PENDING } = require('../../src/constants/devApplications.js').COLORS
 
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
@@ -12,17 +13,16 @@ exports.run = async (handler, message, args, pre) => {
 		responseMessage = 'You\'re already a developer.'
 	} else {
 		let modLog = message.guild.channels.cache.find(c => c.name === 'mod-log')
-		let applicationMessage = new discord.MessageEmbed()
+		let applicationMessage = new Discord.MessageEmbed()
 			.setAuthor(member.displayName, message.author.displayAvatarURL())
 			.setTitle('Developer Role Application')
 			.addField('User ID:', message.member.id)
 			.addField('GitHub URL:', args.github)
-			.setColor(0xFEFEFE) // pure white (0xFFFFFF) is displayed as the default embed color
+			.setColor(PENDING)
 
-		let messageId
-		await modLog.send({ embed: applicationMessage }).then(function (m) { messageId = m.id })
+		let logMessage = await modLog.send({ embed: applicationMessage })
 
-		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.github, messageId: messageId })
+		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.github, messageId: logMessage.id })
 		await devApplication.save()
 
 		responseMessage = 'Thank you for your application! Please be patient as The Council processes your request.'

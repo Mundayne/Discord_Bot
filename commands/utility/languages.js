@@ -80,8 +80,12 @@ exports.run = async (handler, message, args, pre) => {
 		}
 	}
 
-	await member.roles.add(rolesToAdd)
-	await member.roles.remove(rolesToRemove)
+	let targetRoles = member.roles.cache
+	for (let role of rolesToAdd) {
+		targetRoles.set(role.id, role)
+	}
+	targetRoles.sweep(e => rolesToRemove.some(f => e.id === f.id))
+	await member.roles.set(targetRoles)
 
 	let text = `${message.author},`
 	if (rolesToAdd.length) {

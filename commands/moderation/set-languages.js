@@ -43,9 +43,8 @@ exports.run = async (handler, message, args, pre) => {
 			// language doesn't exist
 			continue
 		}
-		let actualName = language.name
 		await language.delete()
-		removedLanguages.push(actualName)
+		removedLanguages.push(language.name)
 	}
 
 	let text = `${message.author}\n`

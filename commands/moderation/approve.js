@@ -1,4 +1,5 @@
 const { DevApplication } = require('../../src/models')
+const { APPROVED, DENIED, ORPHANED } = require('../../src/constants/devApplications.js').COLORS
 
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
@@ -26,7 +27,7 @@ exports.run = async (handler, message, args, pre) => {
 			member = message.guild.member(args.user) || await message.guild.members.fetch(args.user)
 		} catch (err) {
 			if (err.message === 'Unknown Member') {
-				embed.color = 0x000000
+				embed.color = ORPHANED
 				await msg.edit({ embed: embed })
 				await devApplication.remove()
 				return message.reply('That user is no longer in the server.')
@@ -39,11 +40,11 @@ exports.run = async (handler, message, args, pre) => {
 			await member.roles.add(developerRole)
 			await member.send(`Your application for the Developer role has been approved!\n${args.message || ''}`)
 			responseMessage = 'Application approved, member informed.'
-			embed.color = 0x005AB5
+			embed.color = APPROVED
 		} else {
 			await member.send(`Your application for the Developer role has been denied.\n${args.message || ''}`)
 			responseMessage = 'Application denied, member informed.'
-			embed.color = 0xDC3220
+			embed.color = DENIED
 		}
 		await msg.edit({ embed: embed })
 		await devApplication.remove()
