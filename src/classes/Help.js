@@ -37,7 +37,7 @@ class Help {
 	}
 
 	async _baseEmbed (guild) {
-		let botMember = await guild.members.fetch(guild.client.user)
+		let botMember = guild.me || await guild.members.fetch(guild.client.user)
 		return new Discord.MessageEmbed().setColor(botMember.displayColor || null)
 	}
 }

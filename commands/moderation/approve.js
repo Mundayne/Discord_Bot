@@ -1,8 +1,8 @@
 const { DevApplication } = require('../../src/models')
+const { APPROVED, DENIED, ORPHANED } = require('../../src/constants/devApplications.js').COLORS
 
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
-	let member = message.guild.member(args.user)
 	let devApplication = await DevApplication.where().findOne({ userId: args.user, guildId: message.guild.id }).exec()
 
 	if (devApplication) {
@@ -22,19 +22,32 @@ exports.run = async (handler, message, args, pre) => {
 			color: msgEmbed.color
 		}
 
+		let member
+		try {
+			member = message.guild.member(args.user) || await message.guild.members.fetch(args.user)
+		} catch (err) {
+			if (err.message === 'Unknown Member') {
+				embed.color = ORPHANED
+				await msg.edit({ embed: embed })
+				await devApplication.remove()
+				return message.reply('That user is no longer in the server.')
+			}
+			throw err
+		}
+
 		if (args.approved) {
 			let developerRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'developer')
 			await member.roles.add(developerRole)
-			await member.send(`Your application for the Developer role has been approved!\n${args.message}`)
+			await member.send(`Your application for the Developer role has been approved!\n${args.message || ''}`)
 			responseMessage = 'Application approved, member informed.'
-			embed.color = 0x00ff00
+			embed.color = APPROVED
 		} else {
-			await member.send(`Your application for the Developer role has been denied.\n${args.message}`)
+			await member.send(`Your application for the Developer role has been denied.\n${args.message || ''}`)
 			responseMessage = 'Application denied, member informed.'
-			embed.color = 0xff0000
+			embed.color = DENIED
 		}
 		await msg.edit({ embed: embed })
-		await devApplication.deleteOne().exec()
+		await devApplication.remove()
 	} else {
 		responseMessage = 'That user has not applied for the developer role.'
 	}

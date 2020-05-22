@@ -60,8 +60,16 @@ exports.run = async (handler, message, args, pre) => {
 
 	let quoteText = quoteMessage.content
 	let quotePermalink = `\n\n[Permalink](${quoteMessage.url})`
+	let member
+	try {
+		member = quoteMessage.member || await quoteMessage.guild.members.fetch(quoteMessage.author)
+	} catch (err) {
+		if (!err.message === 'Unknown Member') {
+			throw err
+		}
+	}
 	let embed = new Discord.MessageEmbed()
-		.setColor((message.guild.member(quoteMessage.author) && message.guild.member(quoteMessage.author).displayColor) || null)
+		.setColor((member && member.displayColor) || null)
 		.setAuthor(quoteMessage.author.username, quoteMessage.author.avatarURL())
 		.setTimestamp(quoteMessage.createdTimestamp)
 

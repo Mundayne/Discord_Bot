@@ -66,7 +66,7 @@ exports.run = async (handler, message, args, pre) => {
 		await Promise.all(deletions)
 	}
 
-	let member = await message.guild.members.fetch(message.author)
+	let member = message.member || await message.guild.members.fetch(message.author)
 
 	// ignore roles that the user wants to add, but already has / wants to remove, but already doesn't have
 	for (let i = rolesToAdd.length - 1; i >= 0; --i) {
@@ -80,8 +80,12 @@ exports.run = async (handler, message, args, pre) => {
 		}
 	}
 
-	await member.roles.add(rolesToAdd)
-	await member.roles.remove(rolesToRemove)
+	let targetRoles = member.roles.cache
+	for (let role of rolesToAdd) {
+		targetRoles.set(role.id, role)
+	}
+	targetRoles.sweep(e => rolesToRemove.some(f => e.id === f.id))
+	await member.roles.set(targetRoles)
 
 	let text = `${message.author},`
 	if (rolesToAdd.length) {

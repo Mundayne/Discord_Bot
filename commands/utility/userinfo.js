@@ -3,14 +3,14 @@ const Discord = require('discord.js')
 const formatDate = require('../../src/utility/formatDate.js')
 
 exports.run = async (handler, message, args, pre) => {
-	let member = message.member
+	let member
 
 	if (args.user) {
 		let user
 
 		try {
-			user = await message.client.users.fetch(args.user)
-			member = await message.guild.members.fetch(user)
+			user = message.client.users.cache.get(args.user) || await message.client.users.fetch(args.user)
+			member = message.guild.member(user) || await message.guild.members.fetch(user)
 		} catch (exception) {
 			if (user) {
 				return message.channel.send('User is not in server.')
@@ -18,6 +18,10 @@ exports.run = async (handler, message, args, pre) => {
 				return message.channel.send('Invalid user.')
 			}
 		}
+	}
+
+	if (!member) {
+		member = message.member || await message.guild.members.fetch(message.author)
 	}
 
 	const embed = new Discord.MessageEmbed()
