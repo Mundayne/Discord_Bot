@@ -4,17 +4,20 @@ const discord = require('discord.js')
 exports.run = async (handler, message, args, pre) => {
 	let responseMessage
 	let existingApplication = await DevApplication.findOne({ userId: message.author.id, guildId: message.guild.id }).exec()
+	let member = message.member || await message.guild.members.fetch(message.author)
+
 	if (existingApplication) {
 		responseMessage = 'You\'ve already requested the developer role; please be patient as The Council processes your request.'
+	} else if (member.roles.cache.some(r => r.name.toLowerCase() === 'developer')) {
+		responseMessage = 'You\'re already a developer.'
 	} else {
 		let modLog = message.guild.channels.cache.find(c => c.name === 'mod-log')
-		let member = message.member || await message.guild.members.fetch(message.author)
 		let applicationMessage = new discord.MessageEmbed()
 			.setAuthor(member.displayName, message.author.displayAvatarURL())
 			.setTitle('Developer Role Application')
 			.addField('User ID:', message.member.id)
 			.addField('GitHub URL:', args.github)
-			.setColor(0xffffff)
+			.setColor(0xFEFEFE) // pure white (0xFFFFFF) is displayed as the default embed color
 
 		let messageId
 		await modLog.send({ embed: applicationMessage }).then(function (m) { messageId = m.id })

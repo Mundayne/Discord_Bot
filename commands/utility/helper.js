@@ -1,8 +1,8 @@
 exports.run = async (handler, message, args, pre) => {
 	let member = message.member || await message.guild.members.fetch(message.author)
 
-	let helperRole = await message.guild.roles.cache.find(role => role.name === 'Helper')
-	let developerRole = await message.guild.roles.cache.find(role => role.name === 'Developer')
+	let helperRole = await message.guild.roles.cache.find(role => role.name.toLowerCase() === 'helper')
+	let developerRole = await message.guild.roles.cache.find(role => role.name.toLowerCase() === 'developer')
 
 	let hadRole = false
 	let isDeveloper = false
@@ -20,11 +20,11 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	if (!isDeveloper) {
-		message.reply('you are not a developer. Please apply to be a developer before adding the helper role!')
+		await message.reply('you are not a developer. Please apply to be a developer before adding the helper role!')
 	} else if (hadRole) {
-		message.reply(`added the Helper role!`)
+		await message.reply(`added the Helper role!`)
 	} else if (!hadRole) {
-		message.reply('removed the Helper role!')
+		await message.reply('removed the Helper role!')
 	}
 }
 

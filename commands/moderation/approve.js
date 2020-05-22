@@ -37,16 +37,16 @@ exports.run = async (handler, message, args, pre) => {
 		if (args.approved) {
 			let developerRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'developer')
 			await member.roles.add(developerRole)
-			await member.send(`Your application for the Developer role has been approved!\n${args.message}`)
+			await member.send(`Your application for the Developer role has been approved!\n${args.message || ''}`)
 			responseMessage = 'Application approved, member informed.'
-			embed.color = 0x00ff00
+			embed.color = 0x005AB5
 		} else {
-			await member.send(`Your application for the Developer role has been denied.\n${args.message}`)
+			await member.send(`Your application for the Developer role has been denied.\n${args.message || ''}`)
 			responseMessage = 'Application denied, member informed.'
-			embed.color = 0xff0000
+			embed.color = 0xDC3220
 		}
 		await msg.edit({ embed: embed })
-		await devApplication.deleteOne().exec()
+		await devApplication.remove()
 	} else {
 		responseMessage = 'That user has not applied for the developer role.'
 	}
