@@ -11,7 +11,7 @@ exports.run = async (handler, message, args, pre) => {
 	// delete any languages that don't have roles anymore
 	let deletions = []
 	for (let i = availableLanguages.length - 1; i >= 0; --i) {
-		if (!message.guild.roles.find(e => e.name === availableLanguages[i].name)) {
+		if (!message.guild.roles.cache.find(e => e.name === availableLanguages[i].name)) {
 			deletions.push(availableLanguages[i].delete())
 			availableLanguages.splice(i, 1)
 		}
@@ -28,8 +28,8 @@ exports.run = async (handler, message, args, pre) => {
 			// language already exists
 			continue
 		}
-		if (!message.guild.roles.find(e => e.name === lang)) {
-			await message.guild.createRole({ name: lang, permissions: [] })
+		if (!message.guild.roles.cache.find(e => e.name === lang)) {
+			await message.guild.roles.create({ data: { name: lang, permissions: [] } })
 			createdRoles.push(lang)
 		}
 		let language = new Language({ name: lang, guildId: message.guild.id })

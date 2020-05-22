@@ -20,7 +20,7 @@ class ReminderManager {
 			let reminderTimeout = reminder.reminderDate - Date.now()
 			setTimeout(async () => {
 				try {
-					let user = await this.handler.client.fetchUser(reminder.userId)
+					let user = await this.handler.client.users.fetch(reminder.userId)
 					await user.send(`Reminding you${reminder.reminderReason ? ` for \`${reminder.reminderReason}\`` : ''}!`)
 					await reminder.delete()
 					this.loadedReminders.delete(String(reminder._id))

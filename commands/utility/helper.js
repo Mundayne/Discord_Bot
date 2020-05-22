@@ -1,18 +1,18 @@
 exports.run = async (handler, message, args, pre) => {
-	let member = await message.guild.fetchMember(message.author)
+	let member = await message.guild.members.fetch(message.author)
 
-	let helperRole = await message.guild.roles.find(role => role.name === 'Helper')
-	let developerRole = await message.guild.roles.find(role => role.name === 'Developer')
+	let helperRole = await message.guild.roles.cache.find(role => role.name === 'Helper')
+	let developerRole = await message.guild.roles.cache.find(role => role.name === 'Developer')
 
 	let hadRole = false
 	let isDeveloper = false
 
-	if (member.roles.has(developerRole.id)) {
-		if (member.roles.has(helperRole.id)) {
-			await member.removeRole(helperRole)
+	if (member.roles.cache.has(developerRole.id)) {
+		if (member.roles.cache.has(helperRole.id)) {
+			await member.roles.remove(helperRole)
 			hadRole = false
-		} else if (!member.roles.has(helperRole.id)) {
-			await member.addRole(helperRole)
+		} else if (!member.roles.cache.has(helperRole.id)) {
+			await member.roles.add(helperRole)
 			hadRole = true
 		}
 

@@ -47,7 +47,7 @@ class Handler {
 						if (typeof command.pre !== 'function') {
 							if (group === 'moderation') {
 								command.pre = async (handler, message) => {
-									let authorMember = await message.guild.fetchMember(message.author)
+									let authorMember = await message.guild.members.fetch(message.author)
 									if (!authorMember.hasPermission('ADMINISTRATOR')) {
 										throw new InsufficientPermissionsError()
 									}
@@ -92,21 +92,21 @@ class Handler {
 		// update member roles database
 		logger.debug('Updating member roles database.')
 		let saveOps = []
-		for (let guild of this.client.guilds.array()) {
-			await guild.fetchMembers()
+		for (let guild of this.client.guilds.cache.array()) {
+			await guild.members.fetch()
 			let docs = await MemberRoles.find({ guildId: guild.id }).exec()
 
 			// don't change documents of members that aren't in the server
 			docs = docs.filter(e => guild.member(e.userId))
 
 			// create documents for not yet saved members
-			let newMembers = guild.members.array().filter(e => !e.user.bot && e.roles.size && !docs.find(d => d.userId === e.user.id))
+			let newMembers = guild.members.cache.array().filter(e => !e.user.bot && e.roles.cache.size && !docs.find(d => d.userId === e.user.id))
 			for (let newMember of newMembers) {
 				docs.push(new MemberRoles({ guildId: guild.id, userId: newMember.user.id, roleIds: [] }))
 			}
 
 			for (let doc of docs) {
-				let memberRoleIds = guild.member(doc.userId).roles.filter(r => !r.managed && r.id !== r.guild.id).map(r => r.id).sort()
+				let memberRoleIds = guild.member(doc.userId).roles.cache.filter(r => !r.managed && r.id !== r.guild.id).map(r => r.id).sort()
 				if (memberRoleIds.join() !== doc.roleIds.join()) {
 					doc.roleIds = memberRoleIds
 					saveOps.push(doc.save())
@@ -143,15 +143,15 @@ class Handler {
 		} catch (e) {
 			if (e instanceof ArgumentError) {
 				logger.info(`Invalid arguments given for command "${name}"`)
-				message.reply(e.message).then(m => m.delete(8000)).catch(logger.error)
+				message.reply(e.message).then(m => m.delete({ timeout: 8000 })).catch(logger.error)
 			} else if (e instanceof InsufficientPermissionsError) {
 				logger.warn(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
-				message.reply('you are not authorized to use this command.').then(m => m.delete(8000)).catch(logger.error)
+				message.reply('you are not authorized to use this command.').then(m => m.delete({ timeout: 8000 })).catch(logger.error)
 			} else if (e instanceof PreCheckFailedError) {
 				logger.warn(`Pre-Check failed for command "${name}", reason: ${e.message}`)
 			} else if (e instanceof UnixArgumentError) {
 				logger.info(`Invalid arguments given for command "${name}"`)
-				message.reply(e.message).then(m => m.delete(8000)).catch(logger.error)
+				message.reply(e.message).then(m => m.delete({ timeout: 8000 })).catch(logger.error)
 			} else if (e instanceof UnixHelpError) {
 				logger.info(`Sending usage information for command "${name}"`)
 				let embed = await this.help.commandHelp(message.guild, name)
@@ -165,12 +165,12 @@ class Handler {
 
 	async messageDelete (message) {
 		try {
-			let logChannel = message.guild.channels.find(e => e.name === 'message-deletions')
+			let logChannel = message.guild.channels.cache.find(e => e.name === 'message-deletions')
 			if (!logChannel) throw new Error(`No logging channel for message deletions found in guild "${message.guild.name}"`)
 			if (message.channel.id === logChannel.id) return
-			let embed = new Discord.RichEmbed()
+			let embed = new Discord.MessageEmbed()
 				.setColor(message.member.displayColor || null)
-				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL)
+				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL())
 				.setDescription(message.content)
 				.addField('Channel', `${message.channel} (#${message.channel.name})`, true)
 				.addField('Author', `${message.author}`, true)
@@ -190,14 +190,14 @@ class Handler {
 		if (doc) {
 			let rolesToAdd = []
 			for (let roleId of doc.roleIds) {
-				let role = member.guild.roles.get(roleId)
+				let role = member.guild.roles.cache.get(roleId)
 				if (role) {
 					rolesToAdd.push(role)
 				}
 			}
 			if (rolesToAdd.length) {
 				logger.info(`${member.user.username} (${member.user.id}) rejoined, readding ${rolesToAdd.length} roles`)
-				member.addRoles(rolesToAdd).catch(logger.error)
+				member.roles.add(rolesToAdd).catch(logger.error)
 			}
 		}
 	}
@@ -205,8 +205,8 @@ class Handler {
 	async guildMemberUpdate (oldMember, newMember) {
 		if (newMember.user.bot) return
 
-		let oldMemberRoles = oldMember.roles.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
-		let newMemberRoles = newMember.roles.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
+		let oldMemberRoles = oldMember.roles.cache.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
+		let newMemberRoles = newMember.roles.cache.filter(e => !e.managed && e.id !== e.guild.id).map(e => e.id).sort()
 
 		if (oldMemberRoles.join() !== newMemberRoles.join()) {
 			let doc = await MemberRoles.findOne({ guildId: newMember.guild.id, userId: newMember.user.id }).exec()

@@ -34,7 +34,7 @@ exports.run = async (handler, message, args, pre) => {
 			notAvailable = true
 			continue
 		}
-		let role = message.guild.roles.find(e => e.name.toLowerCase() === lang)
+		let role = message.guild.roles.cache.find(e => e.name.toLowerCase() === lang)
 		if (!role) {
 			notAvailable = true
 			continue
@@ -46,7 +46,7 @@ exports.run = async (handler, message, args, pre) => {
 			notAvailable = true
 			continue
 		}
-		let role = message.guild.roles.find(e => e.name.toLowerCase() === lang)
+		let role = message.guild.roles.cache.find(e => e.name.toLowerCase() === lang)
 		if (!role) {
 			notAvailable = true
 			continue
@@ -58,7 +58,7 @@ exports.run = async (handler, message, args, pre) => {
 	if (notAvailable || args.list) {
 		let deletions = []
 		for (let i = availableLanguages.length - 1; i >= 0; --i) {
-			if (!message.guild.roles.find(e => e.name === availableLanguages[i].name)) {
+			if (!message.guild.roles.cache.find(e => e.name === availableLanguages[i].name)) {
 				deletions.push(availableLanguages[i].delete())
 				availableLanguages.splice(i, 1)
 			}
@@ -66,22 +66,22 @@ exports.run = async (handler, message, args, pre) => {
 		await Promise.all(deletions)
 	}
 
-	let member = await message.guild.fetchMember(message.author)
+	let member = await message.guild.members.fetch(message.author)
 
 	// ignore roles that the user wants to add, but already has / wants to remove, but already doesn't have
 	for (let i = rolesToAdd.length - 1; i >= 0; --i) {
-		if (member.roles.has(rolesToAdd[i].id)) {
+		if (member.roles.cache.has(rolesToAdd[i].id)) {
 			rolesToAdd.splice(i, 1)
 		}
 	}
 	for (let i = rolesToRemove.length - 1; i >= 0; --i) {
-		if (!member.roles.has(rolesToRemove[i].id)) {
+		if (!member.roles.cache.has(rolesToRemove[i].id)) {
 			rolesToRemove.splice(i, 1)
 		}
 	}
 
-	await member.addRoles(rolesToAdd)
-	await member.removeRoles(rolesToRemove)
+	await member.roles.add(rolesToAdd)
+	await member.roles.remove(rolesToRemove)
 
 	let text = `${message.author},`
 	if (rolesToAdd.length) {
