@@ -9,11 +9,13 @@ const MemberRoles = require('../models/MemberRoles')
 const CONFIG = require('../../config')
 const ReminderManager = require('./ReminderManager.js')
 const { LOAD_INTERVAL } = require('../../src/constants/reminders.js')
+const Tag = require('../../src/models/Tag.js')
 
 class Handler {
 	constructor (client) {
 		this.commands = { }
 		this.prefix = CONFIG.prefix
+		this.tagPrefix = CONFIG.tagPrefix
 		this.client = client
 		this.help = new Help(this)
 		this.reminderManager = new ReminderManager(this)
@@ -124,42 +126,13 @@ class Handler {
 		// Non-handling cases
 		if (message.author.bot) return
 		if (message.channel.type !== 'text') return
-		if (message.content.substring(0, this.prefix.length) !== this.prefix) return
 
-		let content = message.content.split(' ')
-		let name = content.splice(0, 1)[0].substring(this.prefix.length)
-		if (!name) return
-		let cmds = { }
-		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
-		if (!cmds.hasOwnProperty(name)) return logger.warn(`Command ${name} not found.`)
-		let command = cmds[name]
-		try {
-			logger.info(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
-			let pre = await command.pre(this, message)
-			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(this.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
-			let result = await command.run(this, message, args, pre)
-			await command.post(this, message, result)
-			logger.info(`Command "${name}" complete`)
-		} catch (e) {
-			if (e instanceof ArgumentError) {
-				logger.info(`Invalid arguments given for command "${name}"`)
-				message.reply(e.message).then(m => m.delete({ timeout: 8000 })).catch(logger.error)
-			} else if (e instanceof InsufficientPermissionsError) {
-				logger.warn(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
-				message.reply('you are not authorized to use this command.').then(m => m.delete({ timeout: 8000 })).catch(logger.error)
-			} else if (e instanceof PreCheckFailedError) {
-				logger.warn(`Pre-Check failed for command "${name}", reason: ${e.message}`)
-			} else if (e instanceof UnixArgumentError) {
-				logger.info(`Invalid arguments given for command "${name}"`)
-				message.reply(e.message).then(m => m.delete({ timeout: 8000 })).catch(logger.error)
-			} else if (e instanceof UnixHelpError) {
-				logger.info(`Sending usage information for command "${name}"`)
-				let embed = await this.help.commandHelp(message.guild, name)
-				message.channel.send(embed).catch(logger.error)
-			} else {
-				logger.error(`Error during command "${name}":`)
-				logger.error(e)
-			}
+		if (message.content.startsWith(this.prefix)) {
+			await this._handleCommand(message)
+		}
+
+		if (message.content.startsWith(this.tagPrefix)) {
+			await this._handleTag(message)
 		}
 	}
 
@@ -221,6 +194,58 @@ class Handler {
 			doc = doc || new MemberRoles({ guildId: newMember.guild.id, userId: newMember.user.id })
 			doc.roleIds = newMemberRoles
 			doc.save().catch(logger.error)
+		}
+	}
+
+	async _handleCommand (message) {
+		let content = message.content.split(' ')
+		let name = content.splice(0, 1)[0].substring(this.prefix.length)
+		if (!name) return
+		let cmds = { }
+		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
+		if (!cmds.hasOwnProperty(name)) return logger.warn(`Command ${name} not found.`)
+		let command = cmds[name]
+		try {
+			logger.info(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
+			let pre = await command.pre(this, message)
+			let args = command.yargsOpts ? UnixArguments.parse(command.yargsOpts, message.content.slice(this.prefix.length + name.length).trim()) : Arguments.parse(command.help.args, content.join(' '))
+			let result = await command.run(this, message, args, pre)
+			await command.post(this, message, result)
+			logger.info(`Command "${name}" complete`)
+		} catch (e) {
+			if (e instanceof ArgumentError) {
+				logger.info(`Invalid arguments given for command "${name}"`)
+				message.reply(e.message).then(m => m.delete({ timeout: 8000 })).catch(logger.error)
+			} else if (e instanceof InsufficientPermissionsError) {
+				logger.warn(`${message.author.username} (${message.author.id}) lacks permissions for command "${name}"`)
+				message.reply('you are not authorized to use this command.').then(m => m.delete({ timeout: 8000 })).catch(logger.error)
+			} else if (e instanceof PreCheckFailedError) {
+				logger.warn(`Pre-Check failed for command "${name}", reason: ${e.message}`)
+			} else if (e instanceof UnixArgumentError) {
+				logger.info(`Invalid arguments given for command "${name}"`)
+				message.reply(e.message).then(m => m.delete({ timeout: 8000 })).catch(logger.error)
+			} else if (e instanceof UnixHelpError) {
+				logger.info(`Sending usage information for command "${name}"`)
+				let embed = await this.help.commandHelp(message.guild, name)
+				message.channel.send(embed).catch(logger.error)
+			} else {
+				logger.error(`Error during command "${name}":`)
+				logger.error(e)
+			}
+		}
+	}
+
+	async _handleTag (message) {
+		let name = message.content.slice(this.tagPrefix.length)
+		if (!name) return
+		try {
+			let tag = await Tag.findOne({ guildId: message.guild.id, name: name }).exec()
+			if (!tag) return
+
+			await message.channel.send(tag.content || '', { files: tag.file ? [{ attachment: tag.file, name: tag.filename }] : [] })
+		} catch (err) {
+			logger.error(`Error during tag "${name}":`)
+			logger.error(err)
 		}
 	}
 }
