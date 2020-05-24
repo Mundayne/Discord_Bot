@@ -3,6 +3,7 @@
 	"database": "mongodb://localhost:27017/db-community-bot",
 	"loggingLevel": "info",
 	"prefix": "?",
+	"tagPrefix": ".",
 	"procName": "Discord_Bots",
 	"authors": ["Mundane"]
 }
