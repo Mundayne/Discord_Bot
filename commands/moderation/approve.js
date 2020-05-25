@@ -30,7 +30,7 @@ exports.run = async (handler, message, args, pre) => {
 				embed.color = ORPHANED
 				await msg.edit({ embed: embed })
 				await devApplication.remove()
-				return message.reply('That user is no longer in the server.')
+				return message.reply('that user is no longer in the server.')
 			}
 			throw err
 		}
@@ -39,17 +39,17 @@ exports.run = async (handler, message, args, pre) => {
 			let developerRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'developer')
 			await member.roles.add(developerRole)
 			await member.send(`Your application for the Developer role has been approved!\n${args.message || ''}`)
-			responseMessage = 'Application approved, member informed.'
+			responseMessage = 'application approved, member informed.'
 			embed.color = APPROVED
 		} else {
 			await member.send(`Your application for the Developer role has been denied.\n${args.message || ''}`)
-			responseMessage = 'Application denied, member informed.'
+			responseMessage = 'application denied, member informed.'
 			embed.color = DENIED
 		}
 		await msg.edit({ embed: embed })
 		await devApplication.remove()
 	} else {
-		responseMessage = 'That user has not applied for the developer role.'
+		responseMessage = 'that user has not applied for the developer role.'
 	}
 	await message.reply(responseMessage)
 }
