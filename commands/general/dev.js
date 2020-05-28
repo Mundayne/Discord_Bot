@@ -16,12 +16,12 @@ exports.run = async (handler, message, args, pre) => {
 			.setAuthor(message.member.displayName, message.author.displayAvatarURL())
 			.setTitle('Developer Role Application')
 			.addField('User ID:', message.member.id)
-			.addField('GitHub URL:', args.github)
+			.addField('GitHub URL:', args.githubURL)
 			.setColor(PENDING)
 
 		let logMessage = await modLog.send({ embed: applicationMessage })
 
-		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.github, messageId: logMessage.id })
+		let devApplication = new DevApplication({ userId: message.author.id, guildId: message.guild.id, githubUrl: args.githubURL, messageId: logMessage.id })
 		await devApplication.save()
 
 		responseMessage = 'Thank you for your application! Please be patient as The Council processes your request.'
@@ -32,15 +32,21 @@ exports.run = async (handler, message, args, pre) => {
 
 exports.yargsOpts = {
 	alias: {
-		github: ['g', 'url', 'u'],
 		help: ['h']
 	},
-	string: ['github'],
-	required: ['github']
+	positional: {
+		args: [
+			{
+				name: 'githubURL',
+				type: 'string'
+			}
+		],
+		required: 1
+	}
 }
 
 exports.help = {
-	name: ['wizard', 'wiz', 'developer', 'dev'],
+	name: ['dev', 'developer'],
 	group: 'general',
-	description: 'Get the developer role.'
+	description: 'Apply to get the developer role.'
 }
