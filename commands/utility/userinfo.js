@@ -21,7 +21,7 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	if (!member) {
-		member = message.member || await message.guild.members.fetch(message.author)
+		member = message.member
 	}
 
 	const embed = new Discord.MessageEmbed()

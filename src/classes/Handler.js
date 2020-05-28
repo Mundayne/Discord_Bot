@@ -49,8 +49,7 @@ class Handler {
 						if (typeof command.pre !== 'function') {
 							if (group === 'moderation') {
 								command.pre = async (handler, message) => {
-									let authorMember = await message.guild.members.fetch(message.author)
-									if (!authorMember.hasPermission('ADMINISTRATOR')) {
+									if (!message.member.hasPermission('ADMINISTRATOR')) {
 										throw new InsufficientPermissionsError()
 									}
 								}

@@ -37,8 +37,7 @@ class Help {
 	}
 
 	async _baseEmbed (guild) {
-		let botMember = guild.me || await guild.members.fetch(guild.client.user)
-		return new Discord.MessageEmbed().setColor(botMember.displayColor || null)
+		return new Discord.MessageEmbed().setColor(guild.me.displayColor || null)
 	}
 }
 module.exports = Help
