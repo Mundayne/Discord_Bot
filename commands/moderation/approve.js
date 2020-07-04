@@ -38,11 +38,27 @@ exports.run = async (handler, message, args, pre) => {
 		if (args.approved) {
 			let developerRole = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'developer')
 			await member.roles.add(developerRole)
-			await member.send(`Your application for the Developer role has been approved!\n${args.message || ''}`)
+			let applicantResponse = `Your application for the Developer role has been approved!\n${args.message || ''}`
+			try {
+				await member.send(applicantResponse)
+			} catch (err) {
+				if (err.message !== 'Cannot send messages to this user') throw err
+				await message.guild.channels.cache.find(e => e.name === 'bot-commands').send(applicantResponse[0].toLowerCase() + applicantResponse.slice(1), {
+					reply: member
+				})
+			}
 			responseMessage = 'application approved, member informed.'
 			embed.color = APPROVED
 		} else {
-			await member.send(`Your application for the Developer role has been denied.\n${args.message || ''}`)
+			let applicantResponse = `Your application for the Developer role has been denied.\n${args.message || ''}`
+			try {
+				await member.send(applicantResponse)
+			} catch (err) {
+				if (err.message !== 'Cannot send messages to this user') throw err
+				await message.guild.channels.cache.find(e => e.name === 'bot-commands').send(applicantResponse[0].toLowerCase() + applicantResponse.slice(1), {
+					reply: member
+				})
+			}
 			responseMessage = 'application denied, member informed.'
 			embed.color = DENIED
 		}
