@@ -27,7 +27,12 @@ exports.run = async (handler, message, args, pre) => {
 		responseMessage = 'Thank you for your application! Please be patient as The Council processes your request.'
 	}
 
-	await message.author.send(responseMessage)
+	try {
+		await message.author.send(responseMessage)
+	} catch (err) {
+		if (err.message !== 'Cannot send messages to this user') throw err
+		await message.reply(responseMessage[0].toLowerCase() + responseMessage.slice(1))
+	}
 }
 
 exports.yargsOpts = {
