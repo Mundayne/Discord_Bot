@@ -11,7 +11,7 @@ exports.run = async (handler, message, args, pre) => {
 	let quoteMessage
 	if (args.link) {
 		// get message by link
-		let regex = /discordapp\.com\/channels\/\d+\/(\d+)\/(\d+)$/
+		let regex = /discord\.com\/channels\/\d+\/(\d+)\/(\d+)$/
 		try {
 			let match = regex.exec(args.link)
 			let channelId = match[1]
