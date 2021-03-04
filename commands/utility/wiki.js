@@ -19,7 +19,7 @@ exports.run = async (handler, message, args, pre) => {
 		let embed = new Discord.MessageEmbed()
 			.setColor('BLUE')
 			.setTitle(wikiJson.title)
-			.setDescription(wikiJson.extract + '\n\n[Permalink](https://en.wikipedia.org/wiki/' + wikiJson.title.replaceAll(' ', '%20') + ')')
+			.setDescription(`${wikiJson.extract}\n\n[Permalink](https://en.wikipedia.org/wiki/${wikiJson.title.replaceAll(' ', '_')})`)
 			.setFooter('Page ID: ' + wikiJson.pageid)
 
 		if (wikiJson.original) embed.setThumbnail(wikiJson.original.source)
