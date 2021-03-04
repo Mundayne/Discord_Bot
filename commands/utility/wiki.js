@@ -1,5 +1,5 @@
-const https = require('https')
 const Discord = require('discord.js')
+const got = require('got')
 
 exports.run = async (handler, message, args, pre) => {
 	if (!args.text) {
@@ -8,31 +8,27 @@ exports.run = async (handler, message, args, pre) => {
 
 	let query = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages|extracts&titles=${args.text}&exintro=&exsentences=2&redirects=&explaintext=&formatversion=2&piprop=original&format=json`
 
-	https.get(query, (res) => {
-		let data = ''
+	try {
+		let response = await got(query)
+		let wikiJson = JSON.parse(response.body).query.pages[0]
 
-		res.on('data', (chunk) => {
-			data += chunk
-		})
+		if (wikiJson.missing) {
+			return await message.reply('Page not found!')
+		}
 
-		res.on('end', () => {
-			let wikiJson = JSON.parse(data).query.pages[0]
+		let embed = new Discord.MessageEmbed()
+			.setColor('BLUE')
+			.setTitle(wikiJson.title)
+			.setDescription(wikiJson.extract + '\n\n[Permalink](https://en.wikipedia.org/wiki/' + wikiJson.title.replaceAll(' ', '%20') + ')')
+			.setFooter('Page ID: ' + wikiJson.pageid)
 
-			if (wikiJson.missing) {
-				return message.reply('Page not found!')
-			}
+		if (wikiJson.original) embed.setThumbnail(wikiJson.original.source)
 
-			let embed = new Discord.MessageEmbed()
-				.setColor('BLUE')
-				.setTitle(wikiJson.title)
-				.setDescription(wikiJson.extract + '\n\n[Permalink](https://en.wikipedia.org/wiki/' + query + ')')
-				.setFooter('Page ID: ' + wikiJson.pageid)
-
-			if (wikiJson.original) embed.setThumbnail(wikiJson.original.source)
-
-			message.channel.send(embed)
-		})
-	})
+		await message.channel.send(embed)
+	} catch (error) {
+		await message.reply('Something went wrong executing your request.')
+		throw error
+	}
 }
 
 exports.yargsOpts = {
