@@ -25,7 +25,7 @@ class ReminderManager {
 					await reminder.delete()
 					this.loadedReminders.delete(String(reminder._id))
 				} catch (err) {
-					logger.error(`Something happened with a reminder.`)
+					logger.error('Something happened with a reminder.')
 					logger.error(err)
 				}
 			}, reminderTimeout > 0 ? reminderTimeout : 1) // If the reminder time <= 0, remind the user immediately

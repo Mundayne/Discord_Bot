@@ -8,7 +8,7 @@ exports.run = async (handler, message, args, pre) => {
 			await message.reply('removed the Helper role!')
 		} else {
 			await message.member.roles.add(helperRole)
-			await message.reply(`added the Helper role!`)
+			await message.reply('added the Helper role!')
 		}
 	} else {
 		await message.reply('you are not a developer. Please apply to be a developer before adding the Helper role!')

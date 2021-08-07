@@ -8,7 +8,7 @@ class Help {
 	async commandHelp (guild, command) {
 		let cmds = {}
 		Object.values(this.handler.commands).forEach(group => { cmds = { ...cmds, ...group } })
-		if (!cmds.hasOwnProperty(command)) {
+		if (!Object.prototype.hasOwnProperty.call(cmds, command)) {
 			return false
 		}
 		let commandObj = cmds[command]

@@ -49,7 +49,7 @@ exports.run = async (handler, message, args, pre) => {
 
 	let text = `${message.author}\n`
 	if (!(createdRoles.length || createdLanguages.length || removedLanguages.length)) {
-		text += `No roles or languages modified.`
+		text += 'No roles or languages modified.'
 	} else {
 		if (createdRoles.length) {
 			text += `Created role${createdRoles.length === 1 ? '' : 's'} ${createdRoles.map(e => `"${e}"`).join(', ')}.\n`

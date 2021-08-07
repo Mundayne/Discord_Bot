@@ -9,9 +9,9 @@ class Arguments {
 		if (!format || (format[0] !== '<' && format[0] !== '[')) return
 
 		// Will contain argument map for final return
-		let args = { }
+		let args = {}
 		// Will hold argument format objects as arguments are parsed
-		let argFormats = [ ]
+		let argFormats = []
 
 		// Grab all the relevant information from the argument format string
 		format.split(/(?<=>|]) (?=<|\[)/).forEach(arg => {
@@ -22,12 +22,14 @@ class Arguments {
 				throw new Error(`Invalid argument format string: "${arg}"`)
 			}
 			// Temporarily hold some information for each argument's parse
-			argFormats.push({ name: name,
+			argFormats.push({
+				name: name,
 				type: type[0] === '?'
 					? type.substring(1, type.length - 1)
 					: type,
 				required: arg[0] === '<',
-				default: _default })
+				default: _default
+			})
 		})
 
 		// Parse individual arguments, returning a result object

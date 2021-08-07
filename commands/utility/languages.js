@@ -90,15 +90,15 @@ exports.run = async (handler, message, args, pre) => {
 		text += ` added ${rolesToAdd.map(e => `"${e.name}"`).join(', ')}`
 	}
 	if (rolesToAdd.length && rolesToRemove.length) {
-		text += ` and`
+		text += ' and'
 	}
 	if (rolesToRemove.length) {
 		text += ` removed ${rolesToRemove.map(e => `"${e.name}"`).join(', ')}`
 	}
 	if (rolesToAdd.length || rolesToRemove.length) {
-		text += `.\n`
+		text += '.\n'
 	} else {
-		text += ` no roles modified.\n`
+		text += ' no roles modified.\n'
 	}
 	if (notAvailable || args.list) {
 		text += `Available languages:\n${availableLanguages.length ? availableLanguages.map(e => `• ${e.name}`).sort().join('\n') : 'None'}`

@@ -202,7 +202,7 @@ class Handler {
 		if (!name) return
 		let cmds = { }
 		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
-		if (!cmds.hasOwnProperty(name)) return logger.warn(`Command ${name} not found.`)
+		if (!Object.prototype.hasOwnProperty.call(cmds, name)) return logger.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
 			logger.info(`Command "${name}" run by ${message.author.username} (${message.author.id})`)
