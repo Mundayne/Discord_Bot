@@ -149,7 +149,7 @@ class Handler {
 				}
 			}
 			let embed = new Discord.MessageEmbed()
-				.setColor((member && member.displayColor) || null)
+				.setColor(member?.displayColor || null)
 				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL())
 				.setDescription(message.content)
 				.addField('Channel', `${message.channel} (#${message.channel.name})`, true)
