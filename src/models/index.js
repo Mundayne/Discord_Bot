@@ -2,5 +2,6 @@ module.exports = {
 	DevApplication: require('./DevApplication'),
 	Language: require('./Language'),
 	MemberRoles: require('./MemberRoles'),
-	Reminder: require('./Reminder')
+	Reminder: require('./Reminder'),
+	Tag: require('./Tag')
 }

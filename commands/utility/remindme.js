@@ -7,7 +7,7 @@ exports.run = async (handler, message, args, pre) => {
 	}
 
 	// get total milliseconds
-	let ms = ((args.days ? args.days : 0) * 86400000) + ((args.hours ? args.hours : 0) * 3600000) + ((args.minutes ? args.minutes : 0) * 60000) + ((args.seconds ? args.seconds : 0) * 1000)
+	let ms = ((args.days || 0) * 86400000) + ((args.hours || 0) * 3600000) + ((args.minutes || 0) * 60000) + ((args.seconds || 0) * 1000)
 
 	// get future date
 	let reminderDate = Date.now() + ms

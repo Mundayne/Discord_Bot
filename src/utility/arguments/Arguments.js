@@ -60,7 +60,7 @@ class Arguments {
 	}
 
 	static parseArgument (value, format) {
-		let result = { argument: { }, success: false }
+		let result = { argument: {}, success: false }
 
 		// Check nullable argument type and assign default
 		// If no default is provided, let it return false
