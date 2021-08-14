@@ -13,7 +13,7 @@ const Tag = require('../../src/models/Tag.js')
 
 class Handler {
 	constructor (client) {
-		this.commands = { }
+		this.commands = {}
 		this.prefix = CONFIG.prefix
 		this.tagPrefix = CONFIG.tagPrefix
 		this.client = client
@@ -149,7 +149,7 @@ class Handler {
 				}
 			}
 			let embed = new Discord.MessageEmbed()
-				.setColor((member && member.displayColor) || null)
+				.setColor(member?.displayColor || null)
 				.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL())
 				.setDescription(message.content)
 				.addField('Channel', `${message.channel} (#${message.channel.name})`, true)
@@ -200,9 +200,9 @@ class Handler {
 		let content = message.content.split(' ')
 		let name = content.splice(0, 1)[0].substring(this.prefix.length)
 		if (!name) return
-		let cmds = { }
+		let cmds = {}
 		Object.values(this.commands).forEach(c => { cmds = { ...cmds, ...c } })
-		if (!cmds.hasOwnProperty(name)) return logger.warn(`Command ${name} not found.`)
+		if (!Object.prototype.hasOwnProperty.call(cmds, name)) return logger.warn(`Command ${name} not found.`)
 		let command = cmds[name]
 		try {
 			logger.info(`Command "${name}" run by ${message.author.username} (${message.author.id})`)

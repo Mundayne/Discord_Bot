@@ -23,7 +23,7 @@ exports.run = async (handler, message, args, pre) => {
 		}
 	} else {
 		channel = args.channel ? message.client.channels.cache.get(args.channel) : message.channel
-		if (!channel || channel.type !== 'text') {
+		if (channel?.type !== 'text') {
 			return message.reply('"channel" must be a valid text channel.')
 		}
 		if (args.id) {
@@ -69,7 +69,7 @@ exports.run = async (handler, message, args, pre) => {
 		}
 	}
 	let embed = new Discord.MessageEmbed()
-		.setColor((member && member.displayColor) || null)
+		.setColor(member?.displayColor || null)
 		.setAuthor(quoteMessage.author.username, quoteMessage.author.avatarURL())
 		.setTimestamp(quoteMessage.createdTimestamp)
 

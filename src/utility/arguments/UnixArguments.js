@@ -73,8 +73,8 @@ class UnixArguments {
 		}
 
 		// positional arguments
-		let positionalRequired = (opts.positional && opts.positional.required) || 0
-		let positionalArgStrings = ((opts.positional && opts.positional.args) || []).map((e, i) => {
+		let positionalRequired = opts.positional?.required || 0
+		let positionalArgStrings = (opts.positional?.args || []).map((e, i) => {
 			let argString = `${e.name}:${e.type}`
 			if (e.default !== undefined) {
 				if (e.default.description) {
@@ -260,7 +260,7 @@ class UnixArguments {
 		}
 
 		// validate positional arguments
-		if (opts.positional && opts.positional.args) {
+		if (opts.positional?.args) {
 			opts.positional.args.forEach((e, i) => {
 				if (parsed._[i] === undefined) {
 					// check requiredness

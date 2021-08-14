@@ -1,6 +1,6 @@
 {
   "name": "discord_bots",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "A bot made for the /r/Discord_Bots Discord server.",
   "main": "index.js",
   "scripts": {
@@ -24,11 +24,10 @@
     "yargs-parser": "^10.1.0"
   },
   "devDependencies": {
-    "eslint": "^5.6.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.17.2",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0"
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0"
   }
 }

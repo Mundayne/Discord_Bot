@@ -35,7 +35,7 @@ exports.run = async (handler, message, args, pre) => {
 	tag = tag || new Tag({ guildId: message.guild.id, name: args.name })
 	tag.content = args.content
 	tag.file = attachmentBuf
-	tag.filename = attachment && attachment.name
+	tag.filename = attachment?.name
 	await tag.save()
 
 	return message.reply(`tag "${args.name}" ${args.update ? 'updated' : 'created'}.`)

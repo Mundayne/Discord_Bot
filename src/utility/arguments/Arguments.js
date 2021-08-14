@@ -9,9 +9,9 @@ class Arguments {
 		if (!format || (format[0] !== '<' && format[0] !== '[')) return
 
 		// Will contain argument map for final return
-		let args = { }
+		let args = {}
 		// Will hold argument format objects as arguments are parsed
-		let argFormats = [ ]
+		let argFormats = []
 
 		// Grab all the relevant information from the argument format string
 		format.split(/(?<=>|]) (?=<|\[)/).forEach(arg => {
@@ -22,12 +22,14 @@ class Arguments {
 				throw new Error(`Invalid argument format string: "${arg}"`)
 			}
 			// Temporarily hold some information for each argument's parse
-			argFormats.push({ name: name,
+			argFormats.push({
+				name: name,
 				type: type[0] === '?'
 					? type.substring(1, type.length - 1)
 					: type,
 				required: arg[0] === '<',
-				default: _default })
+				default: _default
+			})
 		})
 
 		// Parse individual arguments, returning a result object
@@ -43,7 +45,7 @@ class Arguments {
 						If the argument was optional, perhaps this value is intended to be
 						the next argument's
 					*/
-					if (!argFormat.required && argFormats[i + 1] && argFormats[i + 1].type.includes(typeof passed[i])) {
+					if (!argFormat.required && argFormats[i + 1]?.type.includes(typeof passed[i])) {
 						repeat = true
 						i++
 					} else {
@@ -58,7 +60,7 @@ class Arguments {
 	}
 
 	static parseArgument (value, format) {
-		let result = { argument: { }, success: false }
+		let result = { argument: {}, success: false }
 
 		// Check nullable argument type and assign default
 		// If no default is provided, let it return false
